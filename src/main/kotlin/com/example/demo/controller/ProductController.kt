@@ -24,8 +24,4 @@ class ProductController ( // 코드의형태는 항상 똑같게
     fun getAllProduct(): List<Product>{
         return productService.getAllProduct()
     }
-
-
-
-
 } // class 끝
