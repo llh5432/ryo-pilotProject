@@ -1,0 +1,15 @@
+spring:
+  application.name: shippingman-label-service
+  profiles:
+    active: devel
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://devel-mysql.cx2xunymsvvb.ap-northeast-2.rds.amazonaws.com:3306/ryo-pliot?useSSL=false&autoReconnect=true
+    username: developer
+    password: t2ugus2esteP8AcRacHuSpumUD2m24aw
+  http:
+    encoding:
+      charset: utf-8
+      enabled: true
+      force: true
+server.port: 9090
