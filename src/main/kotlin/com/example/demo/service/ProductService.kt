@@ -15,4 +15,8 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름
     fun getAllProduct(): List<Product>{ // insert 함수..
        return productRepository.findAll()
     }
+
+    fun putProduct(product: Product): Product?{
+        return productRepository.save(product)
+    }
 }
