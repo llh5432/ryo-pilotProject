@@ -13,7 +13,7 @@ data class Product(// class앞에 data를 붙이면 vo객체 역할을 알림
         val productId : Int, // 변수생성방법 자바스크립트랑 비슷함 [변수 변수이름 : 타입]
 
         var menu : String,
-        var price : String,
+        var price : Int,
         @Column(insertable = false, updatable = false)
         val createdAt : LocalDateTime?,
         @Column(insertable = false, updatable = false)
