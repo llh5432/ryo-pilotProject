@@ -19,3 +19,12 @@ data class Product(// class앞에 data를 붙이면 vo객체 역할을 알림
         @Column(insertable = false, updatable = false)
         var updatedAt : LocalDateTime?
 )
+data class Person( // lamda 식 테스트용 data class
+        var name: String,
+        var age: Int,
+        var joinDated: Int)
+
+
+data class animal(
+        var name : String
+)

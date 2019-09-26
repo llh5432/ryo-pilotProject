@@ -35,7 +35,7 @@ class ProductController ( // 코드의형태는 항상 똑같게
     }
     // update
     @PutMapping("/update/{productId}")
-    @ResponseStatus(HttpStatus.OK) //Http상태코드 예외처리 어노테이션..? 왜사용?
+    @ResponseStatus(HttpStatus.OK) //Http상태코드 예외처리 어노테이션..? 왜사용? , 요청이 성공했음을 나타내는 응답상태코드 HTTP 200 OK 그런데 왜 업데이트에만 붙이는지?
     fun updateProductById(
         @PathVariable("productId")productId: Int, @RequestBody product: Product
     ): Product?
@@ -73,5 +73,39 @@ class ProductController ( // 코드의형태는 항상 똑같게
         return productService.getPriceLessThen(selectPrice)
     }
 
+    @GetMapping("lamdaTest")
+    fun getMenuTest(
+            @RequestParam selectMenu: String
+    ): List<Product>?{
+        return productService.lamdaMenu(selectMenu)
+    }
+
+    @GetMapping("lamdaTest2")
+    fun getPriceTest(
+            @RequestParam selectPrice: Int
+    ): List<Product>?{
+        return productService.lamdaPrice(selectPrice)
+    }
+
+    @GetMapping("lamdaTest3")
+    fun getMenuAndPrice(
+            @RequestParam selectPrice: Int, selectMenu: String
+    ): List<Product>{
+        return productService.lamdaMenuAndPrice(selectMenu, selectPrice)
+    }
+
+    @GetMapping("lamdaTest4")
+    fun getPriceTest2(
+            @RequestParam selectPrice: Int
+    ): List<Product>{
+        return productService.lamdaPriceGreaterThen5000(selectPrice)
+    }
+
+    @GetMapping("lamdaTest5")
+    fun getPriceTest3(
+            @RequestParam selectPrice: Int, selectPrice2: Int
+    ): List<Product>{
+        return productService.lamdaPriceBetween(selectPrice, selectPrice2)
+    }
 
 } // class 끝
