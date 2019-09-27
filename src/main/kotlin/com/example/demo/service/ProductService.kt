@@ -39,7 +39,7 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
         productRepository.save(target) // target에 저장된 객체를 save
     }
 
-    @Transactional //Exception발생 시 rollback
+    @Transactional //Exception발생 시 rollback  여기
     fun deleteProduct(product: Mono<Product?>): Mono<Product?> {
         return product.map {
             productRepository.delete(it!!)
