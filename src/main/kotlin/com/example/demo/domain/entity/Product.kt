@@ -25,6 +25,6 @@ data class Person( // lamda 식 테스트용 data class
         var joinDated: Int)
 
 
-data class animal(
+data class animal( //  TEST
         var name : String
 )

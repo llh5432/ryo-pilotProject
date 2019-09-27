@@ -5,6 +5,7 @@ import com.example.demo.domain.entity.Product
 import com.example.demo.domain.entity.animal
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import reactor.core.publisher.Flux
 import java.util.stream.Stream
 
 @SpringBootApplication
@@ -108,5 +109,7 @@ fun main(args: Array<String>) {
     var people3 = listOf(Person("나야나",13,400), Person("응그래",22,1302),Person("맞아용",32,5020),Person("그래마자용",32,5555))
     val maxAge = people3.maxBy { it.age}!!.age
     println(people3.filter { it.age == maxAge })
+
+     var seq : Flux<Int> = Flux.just(1,2,3)
 
 }

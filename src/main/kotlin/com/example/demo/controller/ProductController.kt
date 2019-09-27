@@ -6,6 +6,7 @@ import com.example.demo.service.ProductService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import reactor.core.publisher.Mono
 import java.util.concurrent.ConcurrentHashMap
 
 @RestController // 빈이됨
@@ -15,15 +16,15 @@ class ProductController ( // 코드의형태는 항상 똑같게
 ){  //class 시작
     // Mapping은 되도록 구분되어 보여질 수 있게
     // selectAll
-    @GetMapping("/all")
-    fun getAllProduct(): List<Product>{
+    @GetMapping("/select/all")
+    fun getAllProduct(): Mono<List<Product>> {
         return productService.getAllProduct()
     }
     // select
-    @GetMapping("/{productId}")
+    @GetMapping("/select/{productId}")
     fun getProductById(
             @PathVariable productId: Int //@PathVariable : URL 경로에 변수를 넣어주는거 url email=? 이런거랑비슷한듯
-    ) : Product?{ // 리턴타입이 ?  == nullable
+    ) : Mono<Product?>{ // 리턴타입이 ?  == nullable
         return productService.getProductById(productId) // 위에 생성한 productService.만든함수(매개변수)
     }
     // insert
@@ -38,7 +39,7 @@ class ProductController ( // 코드의형태는 항상 똑같게
     @ResponseStatus(HttpStatus.OK) //Http상태코드 예외처리 어노테이션..? 왜사용? , 요청이 성공했음을 나타내는 응답상태코드 HTTP 200 OK 그런데 왜 업데이트에만 붙이는지?
     fun updateProductById(
         @PathVariable("productId")productId: Int, @RequestBody product: Product
-    ): Product?
+    ): Mono<Product?>
     {
          productService.updateProduct(productId,product)
         return productService.getProductById(productId)
@@ -47,23 +48,16 @@ class ProductController ( // 코드의형태는 항상 똑같게
     @DeleteMapping("/delete/{productId}")
     fun deleteProductById(
         @PathVariable productId : Int
-    ): Product?{ // Product 타입 리턴함
+    ): Mono<Product?> { // Product 타입 리턴함
         val founded = productService.getProductById(productId) // 변수에 founded에 id값의 product 빈객체를 넣음
-        return productService.deleteProduct(founded!!) //!!은 이 값이 반드시있다고 해주는)
+        return productService.deleteProduct(founded) //!!은 이 값이 반드시있다고 해주는)
     }
 
     @GetMapping("/menu")
     fun getMenu(
-            @RequestParam select: String
+            @RequestParam selectMenu: String
     ):List<Product>{
-        return productService.getMenu(select)
-    }
-
-    @GetMapping("/menuAndPrice")
-    fun getMenuAndPrice(
-            @RequestParam selectMenu : String, selectPrice : Int
-    ): List<Product>{
-        return productService.getMenuAndPrice(selectMenu, selectPrice)
+        return productService.getMenu(selectMenu)
     }
 
     @GetMapping("/price")
@@ -73,39 +67,66 @@ class ProductController ( // 코드의형태는 항상 똑같게
         return productService.getPriceLessThen(selectPrice)
     }
 
-    @GetMapping("lamdaTest")
+    @GetMapping("/menuAndPrice")
+    fun getMenuAndPrice(
+            @RequestParam selectMenu: String, selectMinPrice: Int, selectMaxPrice: Int
+    ) : List<Product> {
+        return productService.getMenuAndPriceBetween(selectMenu, selectMinPrice, selectMaxPrice)
+    }
+
+    @GetMapping("/lamdaMenu")
     fun getMenuTest(
             @RequestParam selectMenu: String
     ): List<Product>?{
         return productService.lamdaMenu(selectMenu)
     }
 
-    @GetMapping("lamdaTest2")
+    @GetMapping("/lamdaPrice")
     fun getPriceTest(
             @RequestParam selectPrice: Int
     ): List<Product>?{
         return productService.lamdaPrice(selectPrice)
     }
 
-    @GetMapping("lamdaTest3")
+    @GetMapping("/lamdaMenuAndPrice")
     fun getMenuAndPrice(
             @RequestParam selectPrice: Int, selectMenu: String
     ): List<Product>{
         return productService.lamdaMenuAndPrice(selectMenu, selectPrice)
     }
 
-    @GetMapping("lamdaTest4")
-    fun getPriceTest2(
-            @RequestParam selectPrice: Int
+    @GetMapping("/lamdaGreaterThenPrice")
+    fun getLamdaGreaterThenPrice(
+            @RequestParam selectMinPrice: Int
     ): List<Product>{
-        return productService.lamdaPriceGreaterThen5000(selectPrice)
+        return productService.lamdaPriceGreaterThen(selectMinPrice)
     }
 
-    @GetMapping("lamdaTest5")
-    fun getPriceTest3(
-            @RequestParam selectPrice: Int, selectPrice2: Int
+    @GetMapping("/lamdaLessThenPrice")
+    fun getLamdaLessThenPrice(
+            @RequestParam selectMaxPrice: Int
     ): List<Product>{
-        return productService.lamdaPriceBetween(selectPrice, selectPrice2)
+        return productService.lamdaPriceLessThen(selectMaxPrice)
     }
 
+    @GetMapping("/lamdaPriceBetween")
+    fun getLamdaPriceBetween(
+            @RequestParam selectMinPrice: Int, selectMaxPrice: Int
+    ): List<Product>{
+        return productService.lamdaPriceBetween(selectMinPrice, selectMaxPrice)
+    }
+
+    @GetMapping("/lamdaMenuContainAndLessThenPrice")
+    fun getLamdaMenuContainAndLessThenPrice(
+@RequestParam selectMenu: String, selectMaxPrice: Int
+) : List<Product>{
+    return productService.lamdaMenuContainAndLessThenPrice(selectMenu, selectMaxPrice)
+}
+
+@GetMapping("/lamdaMenuContainAndPriceBetween")
+fun getLamdaMenuContainAndPriceBetween(
+        @RequestParam selectMenu: String, selectMinPrice: Int, selectMaxPrice: Int
+) : List<Product>{
+    return productService.lamdaMenuContainAndPriceBetween(selectMenu, selectMinPrice, selectMaxPrice)
+}
 } // class 끝
