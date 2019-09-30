@@ -12,6 +12,8 @@ data class Product(// class앞에 data를 붙이면 vo객체 역할을 알림
         @GeneratedValue(strategy = GenerationType.IDENTITY) // primary key의 타입이 숫자일경우 autoIncrese 생성됨
         val productId : Int, // 변수생성방법 자바스크립트랑 비슷함 [변수 변수이름 : 타입]
 
+        @Enumerated(EnumType.STRING)
+        var menuType : TypeFood,
         var menu : String,
         var price : Int,
         @Column(insertable = false, updatable = false)
@@ -19,6 +21,14 @@ data class Product(// class앞에 data를 붙이면 vo객체 역할을 알림
         @Column(insertable = false, updatable = false)
         var updatedAt : LocalDateTime?
 )
+enum class TypeFood{
+         KR,
+         JP,
+         CN,
+         PA,
+         BU
+}
+
 data class Person( // lamda 식 테스트용 data class
         var name: String,
         var age: Int,

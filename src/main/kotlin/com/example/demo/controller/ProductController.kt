@@ -6,7 +6,10 @@ import com.example.demo.service.ProductService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.publisher.toFlux
+import reactor.core.publisher.toMono
 import java.util.concurrent.ConcurrentHashMap
 
 @RestController // 빈이됨
@@ -17,8 +20,8 @@ class ProductController ( // 코드의형태는 항상 똑같게
     // Mapping은 되도록 구분되어 보여질 수 있게
     // selectAll
     @GetMapping("/select/all")
-    fun getAllProduct(): Mono<List<Product>> {
-        return productService.getAllProduct()
+    fun getAllProduct(): Flux<Product> {
+        return productService.getAllProduct().toFlux()
     }
     // select
     @GetMapping("/select/{productId}")
@@ -31,7 +34,7 @@ class ProductController ( // 코드의형태는 항상 똑같게
     @PostMapping("/insert")
     fun createProduct(
             @RequestBody product: Product //postman에서 입력했떤 파라미터를 vo에 주입
-    ): Product?{ // create한 데이터값을 보여주기위한 리턴값
+    ): Mono<Product>{ // create한 데이터값을 보여주기위한 리턴값
         return productService.createProduct(product)
     }
     // update
@@ -56,77 +59,77 @@ class ProductController ( // 코드의형태는 항상 똑같게
     @GetMapping("/menu")
     fun getMenu(
             @RequestParam selectMenu: String
-    ):List<Product>{
+    ):Mono<List<Product?>>{
         return productService.getMenu(selectMenu)
     }
 
     @GetMapping("/price")
     fun getPriceLessThen(
             @RequestParam selectPrice: Int
-    ): List<Product>{
+    ): Mono<List<Product?>>{
         return productService.getPriceLessThen(selectPrice)
     }
 
     @GetMapping("/menuAndPrice")
     fun getMenuAndPrice(
             @RequestParam selectMenu: String, selectMinPrice: Int, selectMaxPrice: Int
-    ) : List<Product> {
+    ) : Mono<List<Product?>> {
         return productService.getMenuAndPriceBetween(selectMenu, selectMinPrice, selectMaxPrice)
     }
 
     @GetMapping("/lamdaMenu")
     fun getMenuTest(
             @RequestParam selectMenu: String
-    ): List<Product>?{
+    ): Mono<List<Product?>>{
         return productService.lamdaMenu(selectMenu)
     }
 
     @GetMapping("/lamdaPrice")
     fun getPriceTest(
             @RequestParam selectPrice: Int
-    ): List<Product>?{
+    ): Mono<List<Product?>>{
         return productService.lamdaPrice(selectPrice)
     }
 
     @GetMapping("/lamdaMenuAndPrice")
     fun getMenuAndPrice(
             @RequestParam selectPrice: Int, selectMenu: String
-    ): List<Product>{
+    ): Mono<List<Product?>>{
         return productService.lamdaMenuAndPrice(selectMenu, selectPrice)
     }
 
     @GetMapping("/lamdaGreaterThenPrice")
     fun getLamdaGreaterThenPrice(
             @RequestParam selectMinPrice: Int
-    ): List<Product>{
+    ): Mono<List<Product?>>{
         return productService.lamdaPriceGreaterThen(selectMinPrice)
     }
 
     @GetMapping("/lamdaLessThenPrice")
     fun getLamdaLessThenPrice(
             @RequestParam selectMaxPrice: Int
-    ): List<Product>{
+    ): Mono<List<Product?>>{
         return productService.lamdaPriceLessThen(selectMaxPrice)
     }
 
     @GetMapping("/lamdaPriceBetween")
     fun getLamdaPriceBetween(
             @RequestParam selectMinPrice: Int, selectMaxPrice: Int
-    ): List<Product>{
+    ): Mono<List<Product?>>{
         return productService.lamdaPriceBetween(selectMinPrice, selectMaxPrice)
     }
 
     @GetMapping("/lamdaMenuContainAndLessThenPrice")
     fun getLamdaMenuContainAndLessThenPrice(
-@RequestParam selectMenu: String, selectMaxPrice: Int
-) : List<Product>{
-    return productService.lamdaMenuContainAndLessThenPrice(selectMenu, selectMaxPrice)
-}
+            @RequestParam selectMenu: String, selectMaxPrice: Int
+    ) : Mono<List<Product?>>{
+        return productService.lamdaMenuContainAndLessThenPrice(selectMenu, selectMaxPrice)
+    }
 
-@GetMapping("/lamdaMenuContainAndPriceBetween")
-fun getLamdaMenuContainAndPriceBetween(
-        @RequestParam selectMenu: String, selectMinPrice: Int, selectMaxPrice: Int
-) : List<Product>{
-    return productService.lamdaMenuContainAndPriceBetween(selectMenu, selectMinPrice, selectMaxPrice)
-}
+    @GetMapping("/lamdaMenuContainAndPriceBetween")
+    fun getLamdaMenuContainAndPriceBetween(
+            @RequestParam selectMenu: String, selectMinPrice: Int, selectMaxPrice: Int
+    ) : Mono<List<Product?>>{
+        return productService.lamdaMenuContainAndPriceBetween(selectMenu, selectMinPrice, selectMaxPrice)
+    }
 } // class 끝
