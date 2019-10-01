@@ -12,42 +12,37 @@ import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
 import java.util.concurrent.ConcurrentHashMap
 
-@RestController // 빈이됨
-@RequestMapping("/api")
-class ProductController ( // 코드의형태는 항상 똑같게
-        val productService: ProductService // @autowired productService = ProductService  이거라고 생각하면 됨
+@RestController //손쉽게 데이터교환이 가능한 RestController
+@RequestMapping("/api") // 전체 /api맵핑으로 한번 감쌈
+class ProductController ( // 코드의형태는 항상 똑같게, 관행에 따라 테이블명+Controller
+        val productService: ProductService // @autowired productService = ProductService;  이거라고 생각하면 됨
 ){  //class 시작
     // Mapping은 되도록 구분되어 보여질 수 있게
-    // selectAll
     @GetMapping("/select/all")
     fun getAllProduct(): Flux<Product> {
-        return productService.getAllProduct().toFlux()
+        return productService.getAllProduct().toFlux() // {return 사용}
     }
-    // select
+
     @GetMapping("/select/{productId}")
     fun getProductById(
-            @PathVariable productId: Int //@PathVariable : URL 경로에 변수를 넣어주는거 url email=? 이런거랑비슷한듯
-    ) : Mono<Product?>{ // 리턴타입이 ?  == nullable
-        return productService.getProductById(productId) // 위에 생성한 productService.만든함수(매개변수)
-    }
-    // insert
+    @PathVariable productId: Int //@PathVariable : URL 경로에 매개변수를 넣어주는거
+    ): Mono<Product?> = productService.getProductById(productId)   // {return } 대신 = 하나로 표현이 가능한듯
+
     @PostMapping("/insert")
     fun createProduct(
             @RequestBody product: Product //postman에서 입력했떤 파라미터를 vo에 주입
-    ): Mono<Product>{ // create한 데이터값을 보여주기위한 리턴값
-        return productService.createProduct(product)
-    }
-    // update
+    ): Mono<Product> = productService.createProduct(product) // create한 데이터값을 보여주기위한 리턴값생성
+
     @PutMapping("/update/{productId}")
-    @ResponseStatus(HttpStatus.OK) //Http상태코드 예외처리 어노테이션..? 왜사용? , 요청이 성공했음을 나타내는 응답상태코드 HTTP 200 OK 그런데 왜 업데이트에만 붙이는지?
     fun updateProductById(
-        @PathVariable("productId")productId: Int, @RequestBody product: Product
-    ): Mono<Product?>
-    {
-         productService.updateProduct(productId,product)
-        return productService.getProductById(productId)
+        @PathVariable("productId")productId: Int,
+        @RequestBody product: Product
+    ): Mono<Product?> {
+        productService.updateProduct(productId,product)
+     return productService.getProductById(productId)
     }
-    //delete
+     //서비스를 두번 호출할 때엔 '=' 을 안쓰는듯 하다.
+
     @DeleteMapping("/delete/{productId}")
     fun deleteProductById(
         @PathVariable productId : Int
@@ -59,77 +54,71 @@ class ProductController ( // 코드의형태는 항상 똑같게
     @GetMapping("/menu")
     fun getMenu(
             @RequestParam selectMenu: String
-    ):Mono<List<Product?>>{
-        return productService.getMenu(selectMenu)
-    }
+    ):Mono<List<Product>> = productService.getMenu(selectMenu)
 
     @GetMapping("/price")
     fun getPriceLessThen(
             @RequestParam selectPrice: Int
-    ): Mono<List<Product?>>{
-        return productService.getPriceLessThen(selectPrice)
-    }
+    ): Mono<List<Product?>> = productService.getPriceLessThen(selectPrice)
+
 
     @GetMapping("/menuAndPrice")
     fun getMenuAndPrice(
-            @RequestParam selectMenu: String, selectMinPrice: Int, selectMaxPrice: Int
-    ) : Mono<List<Product?>> {
-        return productService.getMenuAndPriceBetween(selectMenu, selectMinPrice, selectMaxPrice)
-    }
+            @RequestParam selectMenu: String,
+                          selectMinPrice: Int,
+                          selectMaxPrice: Int
+    ) : Mono<List<Product?>> = productService.getMenuAndPriceBetween(selectMenu, selectMinPrice, selectMaxPrice)
 
-    @GetMapping("/lamdaMenu")
+
+    @GetMapping("/streamMenu")
     fun getMenuTest(
             @RequestParam selectMenu: String
-    ): Mono<List<Product?>>{
-        return productService.lamdaMenu(selectMenu)
-    }
+    ): Mono<List<Product?>> = productService.streamMenu(selectMenu)
 
-    @GetMapping("/lamdaPrice")
+
+    @GetMapping("/streamPrice")
     fun getPriceTest(
             @RequestParam selectPrice: Int
-    ): Mono<List<Product?>>{
-        return productService.lamdaPrice(selectPrice)
-    }
+    ): Mono<List<Product?>> = productService.streamPrice(selectPrice)
 
-    @GetMapping("/lamdaMenuAndPrice")
+
+    @GetMapping("/streamMenuAndPrice")
     fun getMenuAndPrice(
             @RequestParam selectPrice: Int, selectMenu: String
-    ): Mono<List<Product?>>{
-        return productService.lamdaMenuAndPrice(selectMenu, selectPrice)
-    }
+    ): Mono<List<Product?>> = productService.streamMenuAndPrice(selectMenu, selectPrice)
 
-    @GetMapping("/lamdaGreaterThenPrice")
-    fun getLamdaGreaterThenPrice(
+
+    @GetMapping("/streamGreaterThenPrice")
+    fun getstreamGreaterThenPrice(
             @RequestParam selectMinPrice: Int
-    ): Mono<List<Product?>>{
-        return productService.lamdaPriceGreaterThen(selectMinPrice)
-    }
+    ): Mono<List<Product?>> = productService.streamPriceGreaterThen(selectMinPrice)
 
-    @GetMapping("/lamdaLessThenPrice")
-    fun getLamdaLessThenPrice(
+
+    @GetMapping("/streamLessThenPrice")
+    fun getstreamLessThenPrice(
             @RequestParam selectMaxPrice: Int
-    ): Mono<List<Product?>>{
-        return productService.lamdaPriceLessThen(selectMaxPrice)
-    }
+    ): Mono<List<Product?>> = productService.streamPriceLessThen(selectMaxPrice)
 
-    @GetMapping("/lamdaPriceBetween")
-    fun getLamdaPriceBetween(
-            @RequestParam selectMinPrice: Int, selectMaxPrice: Int
-    ): Mono<List<Product?>>{
-        return productService.lamdaPriceBetween(selectMinPrice, selectMaxPrice)
-    }
 
-    @GetMapping("/lamdaMenuContainAndLessThenPrice")
-    fun getLamdaMenuContainAndLessThenPrice(
-            @RequestParam selectMenu: String, selectMaxPrice: Int
-    ) : Mono<List<Product?>>{
-        return productService.lamdaMenuContainAndLessThenPrice(selectMenu, selectMaxPrice)
-    }
+    @GetMapping("/streamPriceBetween")
+    fun getstreamPriceBetween(
+            @RequestParam selectMinPrice: Int,
+                          selectMaxPrice: Int
+    ): Mono<List<Product?>> = productService.streamPriceBetween(selectMinPrice, selectMaxPrice)
 
-    @GetMapping("/lamdaMenuContainAndPriceBetween")
-    fun getLamdaMenuContainAndPriceBetween(
-            @RequestParam selectMenu: String, selectMinPrice: Int, selectMaxPrice: Int
-    ) : Mono<List<Product?>>{
-        return productService.lamdaMenuContainAndPriceBetween(selectMenu, selectMinPrice, selectMaxPrice)
-    }
+
+    @GetMapping("/streamMenuContainAndLessThenPrice")
+    fun getstreamMenuContainAndLessThenPrice(
+            @RequestParam selectMenu: String,
+                          selectMaxPrice: Int
+    ) : Mono<List<Product?>> = productService.streamMenuContainAndLessThenPrice(selectMenu, selectMaxPrice)
+
+
+    @GetMapping("/streamMenuContainAndPriceBetween")
+    fun getstreamMenuContainAndPriceBetween(
+            @RequestParam selectMenu: String,
+                          selectMinPrice: Int,
+                          selectMaxPrice: Int
+    ) : Mono<List<Product?>> = productService.streamMenuContainAndPriceBetween(selectMenu, selectMinPrice, selectMaxPrice)
+
 } // class 끝
