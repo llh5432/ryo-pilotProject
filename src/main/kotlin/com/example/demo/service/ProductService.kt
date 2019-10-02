@@ -1,14 +1,14 @@
 package com.example.demo.service
 
 import com.example.demo.domain.entity.Product
-import com.example.demo.domain.entity.TypeFood
+import com.example.demo.domain.entity.TypeMenu
+import com.example.demo.exception.RestException
 import com.example.demo.repository.ProductRepository
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
-import reactor.core.publisher.toMono
 
 
 @Service // 서비스어노테이션
@@ -16,23 +16,26 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
      val productRepository: ProductRepository // @autowired 가 자동으로 생성
 ) {
 
-    fun getMenuEqual(selectMenuType: TypeFood): Mono<List<Product>> = Mono
+    fun getMenuEqual(selectMenuType: TypeMenu): Mono<List<Product>> = Mono
             .fromSupplier {
-                var products = productRepository.findAll().toList()
-                products.filter { it.menuType.equals(selectMenuType)}
+                productRepository.findAll()
+                    .filter { it.menuType == selectMenuType}
+
             }
 
-    fun getProductById(productId: Int): Mono<Product?> = Mono
+
+    fun getProductById(productId: Int): Mono<Product> = Mono
             .fromSupplier {
-                productRepository.findById(productId).orElseGet { null } //생성된 productRepository.적절한함수사용(받은 파라미터값).orElseGet { null } <=이건 try,catch 문이랑 비슷함
+                productRepository.findById(productId)
+                        .orElseThrow { RestException(HttpStatus.BAD_REQUEST, "난그런거못해") }
             }
 
     fun getAllProduct(): Flux<Product> = productRepository.findAll().toFlux()
 
     fun createProduct(product: Product): Mono<Product> = Mono
-                .fromSupplier {
+            .fromSupplier {
                 productRepository.save(product)
-                }
+            }
 
     fun updateProduct(
             productId: Int,
@@ -40,13 +43,13 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
                 var target: Product = productRepository.findById(productId).get() //변수 target 생성 id값으로 product타입 빈객체를 대입
                 Mono.just(target)
                     target.menuType= product.menuType
-                    target.menu= product.menu // update할 파라미터만 이어붙이는듯?
+                    target.menu= product.menu // update할 파라미터만 이어붙이는듯
                     target.price = product.price
                     target.updatedAt = product.updatedAt
                     productRepository.save(target) // target에 저장된 객체를 save
             }
 
-    fun deleteProduct(product: Mono<Product?>): Mono<Product?> = product
+    fun deleteProduct(product: Mono<Product>): Mono<Product> = product
                     .map {
                         productRepository.delete(it!!)
                         it
@@ -58,7 +61,7 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
                         productRepository.findByMenuContaining(selectMenu)
                     }
 
-    fun getPriceLessThen(selectPrice: Int): Mono<List<Product?>> = Mono   // price가 파라미터 이하인 데이터를 List타입으로 select함
+    fun getPriceLessThen(selectPrice: Int): Mono<List<Product>> = Mono   // price가 파라미터 이하인 데이터를 List타입으로 select함
                 .fromSupplier {
                     productRepository.findByPriceLessThanEqual(selectPrice)
                 }
@@ -66,7 +69,7 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
     fun getMenuContainAndLessThenPrice(
             selectMenu: String,
             selectPrice: Int
-    ): Mono<List<Product?>> = Mono
+    ): Mono<List<Product>> = Mono
         .fromSupplier {
             productRepository.findByMenuContainingAndPriceLessThanEqual(selectMenu, selectPrice)
         }
@@ -75,14 +78,14 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
             selectMenu: String,
             selectMinPrice: Int,
             selectMaxPrice: Int
-    ): Mono <List<Product?>> = Mono
+    ): Mono <List<Product>> = Mono
             .fromSupplier {
                 productRepository.findByMenuContainingAndPriceBetween(selectMenu, selectMinPrice, selectMaxPrice)
             }
 
     // ============== JPA Repository 끝=====================
     // stream 함수 응용
-    fun streamMenu(selectMenu: String): Mono<List<Product?>> = Mono
+    fun streamMenu(selectMenu: String): Mono<List<Product>> = Mono
             .fromSupplier {
                 var products = productRepository.findAll().toList() // 변수생성 후 필터시켜볼 테이블데이터를 list타입으로 받아서 담음
                 products.filter { it.menu.contains(selectMenu, true) }//default true, 생략가능
@@ -90,7 +93,7 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
 
 
     // 원하는 가격으로 메뉴 검색
-    fun streamPrice(selectPrice: Int): Mono<List<Product?>> = Mono
+    fun streamPrice(selectPrice: Int): Mono<List<Product>> = Mono
             .fromSupplier {
                 var products = productRepository.findAll().toList()
                 products.filter { it.price.equals(selectPrice) }
@@ -100,27 +103,27 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
     fun streamMenuAndPrice(
             selectMenu: String,
             selectPrice: Int
-    ): Mono<List<Product?>> = Mono
+    ): Mono<List<Product>> = Mono
             .fromSupplier {
-                var products = productRepository.findAll().toList()
+                var products = productRepository.findAll()
                 products.filter { it.menu.contains(selectMenu) and it.price.equals(selectPrice) }
             }
 
-    fun streamPriceGreaterThen(selectMinPrice: Int): Mono<List<Product?>> = Mono
+    fun streamPriceGreaterThen(selectMinPrice: Int): Mono<List<Product>> = Mono
             .fromSupplier {
-                var products = productRepository.findAll().toList()
+                var products = productRepository.findAll()
                 products.filter { it.price >= selectMinPrice }
             }
 
-    fun streamPriceLessThen(selectMaxPrice: Int): Mono<List<Product?>> = Mono
+    fun streamPriceLessThen(selectMaxPrice: Int): Mono<List<Product>> = Mono
             .fromSupplier {
-                var products = productRepository.findAll().toList()
-                products.filter { it.price <= selectMaxPrice }
+                productRepository.findAll()
+                    .filter { it.price <= selectMaxPrice }
             }
 
     fun streamPriceBetween(
             selectPrice: Int,
-            selectPrice2: Int): Mono<List<Product?>> = Mono
+            selectPrice2: Int): Mono<List<Product>> = Mono
                 .fromSupplier {
                     var products = productRepository.findAll().toList()
                     products.filter { it.price >= selectPrice }
@@ -129,10 +132,10 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
 
     fun streamMenuContainAndLessThenPrice(
             selectMenu: String,
-            selectMaxPrice: Int): Mono<List<Product?>> = Mono
+            selectMaxPrice: Int): Mono<List<Product>> = Mono
                 .fromSupplier {
-                        var products = productRepository.findAll().toList()
-                        products.filter { it.menu.contains(selectMenu) }
+                         productRepository.findAll()
+                                .filter { it.menu.contains(selectMenu) }
                                 .filter { it.price <= selectMaxPrice }.toList()
                 }
 
@@ -141,9 +144,9 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
             selectMenu: String,
             selectMinPrice: Int,
             selectMaxPrice: Int
-    ): Mono<List<Product?>> = Mono
+    ): Mono<List<Product>> = Mono
             .fromSupplier {
-                var products = productRepository.findAll().toList()
+                var products = productRepository.findAll()
                 products.filter { it.menu.contains(selectMenu) }
                         .filter { it.price >= selectMinPrice }
                         .filter { it.price <= selectMaxPrice }

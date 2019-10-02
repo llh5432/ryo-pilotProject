@@ -13,7 +13,7 @@ data class Product(// class앞에 data를 붙이면 vo객체 역할을 알림
         var productId : Int, // 변수생성방법 자바스크립트랑 비슷함 [변수 변수이름 : 타입]
         // val과 var 의 차이? => val은 자바의 final 역할인듯, var은 그냥 자바스크립트에서 보는 var
         @Enumerated(EnumType.STRING)// enum 어노테이션 정의 타입은 string으로 정함
-        var menuType : TypeFood,
+        var menuType : TypeMenu,
         var menu : String,
         var price : Int,
         @Column(insertable = false, updatable = false) //이 컬럼을 insert나 update 시킬 때 포함하지않아도 된다 란뜻인듯 데이터베이스쪽에서 알아서한다
@@ -21,10 +21,3 @@ data class Product(// class앞에 data를 붙이면 vo객체 역할을 알림
         @Column(insertable = false, updatable = false)
         var updatedAt : LocalDateTime?
 )
-enum class TypeFood{ //enum 클래스
-         KR, //이것은 음식장르이다.
-         JP,
-         CN,
-         PA,
-         BU
-}
