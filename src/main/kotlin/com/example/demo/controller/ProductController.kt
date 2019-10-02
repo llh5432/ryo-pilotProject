@@ -2,7 +2,9 @@ package com.example.demo.controller
 
 import com.bea.xml.stream.filters.NameFilter
 import com.example.demo.domain.entity.Product
+import com.example.demo.domain.entity.TypeFood
 import com.example.demo.service.ProductService
+import org.apache.commons.lang.enums.Enum
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -12,7 +14,7 @@ import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
 import java.util.concurrent.ConcurrentHashMap
 
-@RestController //손쉽게 데이터교환이 가능한 RestController
+@RestController
 @RequestMapping("/api") // 전체 /api맵핑으로 한번 감쌈
 class ProductController ( // 코드의형태는 항상 똑같게, 관행에 따라 테이블명+Controller
         val productService: ProductService // @autowired productService = ProductService;  이거라고 생각하면 됨
@@ -23,19 +25,26 @@ class ProductController ( // 코드의형태는 항상 똑같게, 관행에 따�
         return productService.getAllProduct().toFlux() // {return 사용}
     }
 
+
+    @GetMapping("/menuType/{selectMenuType}")
+    fun getMenuTypeEqual(
+            @PathVariable selectMenuType : TypeFood
+    ): Mono<List<Product>> = productService.getMenuEqual(selectMenuType)
+
+
     @GetMapping("/select/{productId}")
     fun getProductById(
-    @PathVariable productId: Int //@PathVariable : URL 경로에 매개변수를 넣어주는거
+        @PathVariable productId: Int //@PathVariable : URL 경로에 매개변수를 넣어주는거
     ): Mono<Product?> = productService.getProductById(productId)   // {return } 대신 = 하나로 표현이 가능한듯
 
     @PostMapping("/insert")
     fun createProduct(
-            @RequestBody product: Product //postman에서 입력했떤 파라미터를 vo에 주입
+        @RequestBody product: Product //postman에서 입력했떤 파라미터를 vo에 주입
     ): Mono<Product> = productService.createProduct(product) // create한 데이터값을 보여주기위한 리턴값생성
 
     @PutMapping("/update/{productId}")
     fun updateProductById(
-        @PathVariable("productId")productId: Int,
+        @PathVariable productId: Int,
         @RequestBody product: Product
     ): Mono<Product?> {
         productService.updateProduct(productId,product)
@@ -53,21 +62,23 @@ class ProductController ( // 코드의형태는 항상 똑같게, 관행에 따�
 
     @GetMapping("/menu")
     fun getMenu(
-            @RequestParam selectMenu: String
-    ):Mono<List<Product>> = productService.getMenu(selectMenu)
+        @RequestParam selectMenu: String
+    ): Mono<List<Product>> = productService.getMenu(selectMenu)
 
     @GetMapping("/price")
     fun getPriceLessThen(
-            @RequestParam selectPrice: Int
+        @RequestParam selectPrice: Int
     ): Mono<List<Product?>> = productService.getPriceLessThen(selectPrice)
 
 
     @GetMapping("/menuAndPrice")
     fun getMenuAndPrice(
-            @RequestParam selectMenu: String,
-                          selectMinPrice: Int,
-                          selectMaxPrice: Int
-    ) : Mono<List<Product?>> = productService.getMenuAndPriceBetween(selectMenu, selectMinPrice, selectMaxPrice)
+        @RequestParam selectMenu: String,
+                      selectMinPrice: Int,
+                      selectMaxPrice: Int
+    ): Mono<List<Product?>> = productService.getMenuAndPriceBetween(selectMenu,
+                                                                    selectMinPrice,
+                                                                    selectMaxPrice)
 
 
     @GetMapping("/streamMenu")
@@ -111,7 +122,7 @@ class ProductController ( // 코드의형태는 항상 똑같게, 관행에 따�
     fun getstreamMenuContainAndLessThenPrice(
             @RequestParam selectMenu: String,
                           selectMaxPrice: Int
-    ) : Mono<List<Product?>> = productService.streamMenuContainAndLessThenPrice(selectMenu, selectMaxPrice)
+    ): Mono<List<Product?>> = productService.streamMenuContainAndLessThenPrice(selectMenu, selectMaxPrice)
 
 
     @GetMapping("/streamMenuContainAndPriceBetween")
@@ -119,6 +130,8 @@ class ProductController ( // 코드의형태는 항상 똑같게, 관행에 따�
             @RequestParam selectMenu: String,
                           selectMinPrice: Int,
                           selectMaxPrice: Int
-    ) : Mono<List<Product?>> = productService.streamMenuContainAndPriceBetween(selectMenu, selectMinPrice, selectMaxPrice)
+    ): Mono<List<Product?>> = productService.streamMenuContainAndPriceBetween(selectMenu,
+                                                                               selectMinPrice,
+                                                                               selectMaxPrice)
 
 } // class 끝

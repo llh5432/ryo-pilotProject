@@ -1,6 +1,7 @@
 package com.example.demo.service
 
 import com.example.demo.domain.entity.Product
+import com.example.demo.domain.entity.TypeFood
 import com.example.demo.repository.ProductRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -14,6 +15,12 @@ import reactor.core.publisher.toMono
 class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
      val productRepository: ProductRepository // @autowired 가 자동으로 생성
 ) {
+
+    fun getMenuEqual(selectMenuType: TypeFood): Mono<List<Product>> = Mono
+            .fromSupplier {
+                var products = productRepository.findAll().toList()
+                products.filter { it.menuType.equals(selectMenuType)}
+            }
 
     fun getProductById(productId: Int): Mono<Product?> = Mono
             .fromSupplier {
@@ -39,7 +46,6 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
                     productRepository.save(target) // target에 저장된 객체를 save
             }
 
-    @Transactional //Exception발생 시 rollback
     fun deleteProduct(product: Mono<Product?>): Mono<Product?> = product
                     .map {
                         productRepository.delete(it!!)
@@ -142,5 +148,7 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
                         .filter { it.price >= selectMinPrice }
                         .filter { it.price <= selectMaxPrice }
             }
+
+
 
 }// service끝
