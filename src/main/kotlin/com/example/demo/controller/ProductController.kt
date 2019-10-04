@@ -3,6 +3,8 @@ package com.example.demo.controller
 import com.example.demo.domain.entity.Product
 import com.example.demo.domain.entity.TypeMenu
 import com.example.demo.service.ProductService
+import org.apache.tools.ant.taskdefs.Javadoc
+import org.omg.CORBA.Object
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -77,7 +79,7 @@ class ProductController ( // 코드의형태는 항상 똑같게, 관행에 따�
     @GetMapping("/streamMenu")
     fun getMenuTest(
             @RequestParam selectMenu: String
-    ): Mono<List<Product>> = productService.streamMenu(selectMenu)
+    ): Flux<Product> = productService.streamMenu(selectMenu)
 
 
     @GetMapping("/streamPrice")
