@@ -1,4 +1,4 @@
-package com.example.demo.domain.entity
+package com.example.demo.domain.test
 
 data class animal( //  TEST
         var name : String

@@ -3,28 +3,33 @@ package com.example.demo.controller
 import com.example.demo.domain.entity.Product
 import com.example.demo.domain.entity.TypeMenu
 import com.example.demo.service.ProductService
-import org.apache.tools.ant.taskdefs.Javadoc
-import org.omg.CORBA.Object
+import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
-@RestController
+@Controller
 @RequestMapping("/api") // 전체 /api맵핑으로 한번 감쌈
 class ProductController ( // 코드의형태는 항상 똑같게, 관행에 따라 테이블명+Controller
         val productService: ProductService // @autowired productService = ProductService;  이거라고 생각하면 됨
-){  //class 시작
+){
+
     // Mapping은 되도록 구분되어 보여질 수 있게
     @GetMapping("/select/all")
     fun getAllProduct(): Flux<Product> {
-        return productService.getAllProduct() // {return 사용}
+        return productService.getAllProduct()
     }
+
+    @GetMapping("/TypeMenu")
+    fun getMenuType(
+            @RequestParam selectMenuType: TypeMenu
+    ): Flux<Product> = productService.getMenuEqual(selectMenuType)
 
 
     @GetMapping("/menuType/{selectMenuType}")
     fun getMenuTypeEqual(
             @PathVariable selectMenuType : TypeMenu
-    ): Mono<List<Product>> = productService.getMenuEqual(selectMenuType)
+    ): Flux<Product> = productService.getMenuEqual(selectMenuType)
 
 
     @GetMapping("/select/{productId}")
@@ -55,78 +60,59 @@ class ProductController ( // 코드의형태는 항상 똑같게, 관행에 따�
         return productService.deleteProduct(founded) //!!은 이 값이 반드시있다고 해주는)
     }
 
-    @GetMapping("/menu")
+    @GetMapping("/menuContain")
     fun getMenu(
         @RequestParam selectMenu: String
-    ): Mono<List<Product>> = productService.getMenu(selectMenu)
-
-    @GetMapping("/price")
-    fun getPriceLessThen(
-        @RequestParam selectPrice: Int
-    ): Mono<List<Product>> = productService.getPriceLessThen(selectPrice)
+    ): Flux<Product> = productService.getMenu(selectMenu)
 
 
-    @GetMapping("/menuAndPrice")
-    fun getMenuAndPrice(
-        @RequestParam selectMenu: String,
-                      selectMinPrice: Int,
-                      selectMaxPrice: Int
-    ): Mono<List<Product>> = productService.getMenuAndPriceBetween(selectMenu,
-                                                                    selectMinPrice,
-                                                                    selectMaxPrice)
-
-
-    @GetMapping("/streamMenu")
-    fun getMenuTest(
-            @RequestParam selectMenu: String
-    ): Flux<Product> = productService.streamMenu(selectMenu)
-
-
-    @GetMapping("/streamPrice")
-    fun getPriceTest(
-            @RequestParam selectPrice: Int
-    ): Mono<List<Product>> = productService.streamPrice(selectPrice)
-
-
-    @GetMapping("/streamMenuAndPrice")
-    fun getMenuAndPrice(
-            @RequestParam selectPrice: Int, selectMenu: String
-    ): Mono<List<Product>> = productService.streamMenuAndPrice(selectMenu, selectPrice)
-
-
-    @GetMapping("/streamGreaterThenPrice")
-    fun getstreamGreaterThenPrice(
+    @GetMapping("/GreaterThenPrice")
+    fun getGreaterThenPrice(
             @RequestParam selectMinPrice: Int
-    ): Mono<List<Product>> = productService.streamPriceGreaterThen(selectMinPrice)
+    ): Flux<Product> = productService.priceGreaterThen(selectMinPrice)
 
 
-    @GetMapping("/streamLessThenPrice")
-    fun getstreamLessThenPrice(
+    @GetMapping("/LessThenPrice")
+    fun getLessThenPrice(
             @RequestParam selectMaxPrice: Int
-    ): Mono<List<Product>> = productService.streamPriceLessThen(selectMaxPrice)
+    ): Flux<Product> = productService.priceLessThen(selectMaxPrice)
 
 
-    @GetMapping("/streamPriceBetween")
-    fun getstreamPriceBetween(
+    @GetMapping("/PriceBtw")
+    fun getPriceBetween(
             @RequestParam selectMinPrice: Int,
                           selectMaxPrice: Int
-    ): Mono<List<Product>> = productService.streamPriceBetween(selectMinPrice, selectMaxPrice)
+    ): Flux<Product> = productService.priceBetween(selectMinPrice, selectMaxPrice)
 
 
-    @GetMapping("/streamMenuContainAndLessThenPrice")
-    fun getstreamMenuContainAndLessThenPrice(
-            @RequestParam selectMenu: String,
+    @GetMapping("/TypeMenuAndMenuContain")
+    fun getTypeMenuAndMenuContaion(
+            @RequestParam selectMenuType: TypeMenu,
+                          selectMenu: String
+    ): Flux<Product> = productService.typeMenuAndMenuContain(selectMenuType, selectMenu)
+
+    @GetMapping("/TypeMenuAndPriceGreaterThen")
+    fun getTypeMenuAndPriceGreaterThen(
+            @RequestParam selectMenuType: TypeMenu,
+                          selectMinPrice: Int
+    ): Flux<Product> = productService.typeMenuAndPriceGreaterThen(selectMenuType, selectMinPrice)
+
+    @GetMapping("/TypeMenuAndPriceLessThen")
+    fun getTypeMenuAndPriceLessThen(
+            @RequestParam selectMenuType: TypeMenu,
                           selectMaxPrice: Int
-    ): Mono<List<Product>> = productService.streamMenuContainAndLessThenPrice(selectMenu, selectMaxPrice)
+    ): Flux<Product> = productService.typeMenuAndPriceLessThen(selectMenuType, selectMaxPrice)
 
 
-    @GetMapping("/streamMenuContainAndPriceBetween")
-    fun getstreamMenuContainAndPriceBetween(
-            @RequestParam selectMenu: String,
+    @GetMapping("/TypeEqualAndMenuContainAndPriceBtw")
+    fun getTypeEqualAndMenuContainAndPriceBtw(
+            @RequestParam selectMenuType: TypeMenu,
+                          selectMenu: String,
                           selectMinPrice: Int,
                           selectMaxPrice: Int
-    ): Mono<List<Product>> = productService.streamMenuContainAndPriceBetween(selectMenu,
-                                                                               selectMinPrice,
-                                                                               selectMaxPrice)
-
+    ): Flux<Product> = productService.menuTypeEqualAndMenuContainAndPriceBtw(selectMenuType,
+                                                                             selectMenu,
+                                                                             selectMinPrice,
+                                                                             selectMaxPrice
+    )
 } // class 끝

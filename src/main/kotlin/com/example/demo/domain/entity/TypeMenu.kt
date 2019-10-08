@@ -5,5 +5,6 @@ enum class TypeMenu {
     JP,
     CN,
     PA,
-    BU
+    BU,
+    EU // 없음
 }
