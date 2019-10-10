@@ -27,9 +27,10 @@ class MemberService(
 //            }
 
             member.toMono()
-                    .doOnNext(this::checkAccount)
-                    .doOnNext(this::checkEmail)
-                    .map(memberRepository::save)
+                    .doOnNext(this::checkAccount) // 파리미터 값 member가 성공적일 때 다음 행동을 함
+                    .doOnNext(this::checkEmail) // this란 해당 클래스를 의미함 this클래스의 checkEmail 함수를 사용하는것을 행동(.doOnNext)한다.
+//                    .map(memberRepository::save)  유형 유추실패 유추할 정보가 충분하지않다는 에러 발생
+                    .map { memberRepository.save(it) }
 
 
     fun checkAccount(member: Member) {
@@ -42,7 +43,7 @@ class MemberService(
             throw RestException(HttpStatus.INTERNAL_SERVER_ERROR, "입력하신 ${member.memberEmail} 은 이미 가입한 이메일입니다.")
     }
 
-//    Mono.fromSupplier {
+//    Mono.fromSupplier {  내가 쓴 코드 if 안에 if 절 나도 한참 읽고 있어야 이해 가능 가독성 xxxxx
 //        val resultAccount = memberRepository.findByMemberAccountIsLike(member.memberAccount)
 //
 //        val resultEmail = memberRepository.findByMemberEmailIsLike(member.memberEmail)
@@ -57,21 +58,21 @@ class MemberService(
 //        }
 //    }
 
-    private fun checkMemberAccount(member: Member): Mono<Member> = Mono
-            .fromSupplier {
-                memberRepository.findByMemberAccountIsLike(member.memberAccount)
-            }
-            .onErrorResume {
-                throw NotFoundMemberException(HttpStatus.NOT_FOUND)
-            }
-
-    private fun checkMemberEmail(member: Member): Mono<Member> = Mono
-            .fromSupplier {
-                memberRepository.findByMemberEmailIsLike(member.memberEmail)
-            }
-            .onErrorResume {
-                throw NotFoundMemberException(HttpStatus.NOT_FOUND)
-            }
+//    private fun checkMemberAccount(member: Member): Mono<Member> = Mono
+//            .fromSupplier {
+//                memberRepository.findByMemberAccountIsLike(member.memberAccount)
+//            }
+//            .onErrorResume {
+//                throw NotFoundMemberException(HttpStatus.NOT_FOUND)
+//            }
+//
+//    private fun checkMemberEmail(member: Member): Mono<Member> = Mono
+//            .fromSupplier {
+//                memberRepository.findByMemberEmailIsLike(member.memberEmail)
+//            }
+//            .onErrorResume {
+//                throw NotFoundMemberException(HttpStatus.NOT_FOUND)
+//            }
 
     fun selectMemberAll(): Flux<Member> = Mono
             .fromSupplier {
