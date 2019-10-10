@@ -1,6 +1,7 @@
 package com.example.demo.exception
 
 import com.fasterxml.jackson.core.JsonParseException
+import javassist.NotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.server.ServerWebInputException
 import reactor.netty.http.server.HttpServerRequest
+import java.lang.ClassNotFoundException as ClassNotFoundException1
 
 @RestControllerAdvice // RestController단의 예외를 잡아 처리해주는 어노테이션 전역적으로 exception을 처리하고 싶다
 object ErrorHandler { //타입이 object인 이유 : 컨트롤러단 안에 있는 모든 함수의 리턴값들이 서로 다르니 모든 리턴 타입을 충족시킬수있는 게 object가 아닐까 생각함

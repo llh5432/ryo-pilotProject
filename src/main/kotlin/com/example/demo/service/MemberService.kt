@@ -89,30 +89,25 @@ class MemberService(
     fun selectMemberAccount(
             memberEmail: String,
             memberName: String
-    ): Mono<String> = Mono
-            .fromSupplier {
-                memberRepository.findByMemberEmailAndMemberNameEquals(memberEmail, memberName)
-            }
-            .flatMap {
-                if (it != null) {
-                    it.memberAccount.toMono()
-                } else {
-                    throw RestException(HttpStatus.NOT_FOUND, "$memberEmail , $memberName 으로 찾은 ID가 없습니다.")
-                }
-            }
+    ): Mono<String> {
+        val account = memberRepository.findByMemberEmailAndMemberNameEquals(memberEmail, memberName)
+        if (account == null) {
+            throw RestException(HttpStatus.NOT_FOUND, "$memberEmail , $memberName 으로 찾은 ID가 없습니다.")
+        } else {
+            return account.memberAccount.toMono()
+        }
+    }
+
 
     fun selectMemberPasswd(
             memberAccount: String,
             memberEmail: String
-    ): Mono<String> = Mono
-            .fromSupplier {
-                memberRepository.findByMemberAccountIsLikeAndAndMemberEmailLike(memberAccount, memberEmail)
-            }
-            .flatMap {
-                if (it != null) {
-                    it.memberPasswd.toString().toMono()
-                } else {
+    ): Mono<String> {
+             val passwd = memberRepository.findByMemberAccountIsLikeAndAndMemberEmailLike(memberAccount, memberEmail)
+                if (passwd == null) {
                     throw RestException(HttpStatus.NOT_FOUND, "$memberAccount, $memberEmail 으로 찾은 PASSWORD가 없습니다.")
+                } else {
+                    return passwd.memberPasswd.toMono()
                 }
             }
 
