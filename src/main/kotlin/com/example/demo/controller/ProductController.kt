@@ -1,7 +1,7 @@
 package com.example.demo.controller
 
 import com.example.demo.domain.entity.Product
-import com.example.demo.domain.entity.TypeMenu
+import com.example.demo.domain.Enum.TypeMenu
 import com.example.demo.service.ProductService
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
@@ -88,28 +88,28 @@ class ProductController ( // 코드의형태는 항상 똑같게, 관행에 따�
     @GetMapping("/TypeMenuAndMenuContain")
     fun getTypeMenuAndMenuContaion(
             @RequestParam selectMenuType: TypeMenu,
-                          selectMenu: String
+            selectMenu: String
     ): Flux<Product> = productService.typeMenuAndMenuContain(selectMenuType, selectMenu)
 
     @GetMapping("/TypeMenuAndPriceGreaterThen")
     fun getTypeMenuAndPriceGreaterThen(
             @RequestParam selectMenuType: TypeMenu,
-                          selectMinPrice: Int
+            selectMinPrice: Int
     ): Flux<Product> = productService.typeMenuAndPriceGreaterThen(selectMenuType, selectMinPrice)
 
     @GetMapping("/TypeMenuAndPriceLessThen")
     fun getTypeMenuAndPriceLessThen(
             @RequestParam selectMenuType: TypeMenu,
-                          selectMaxPrice: Int
+            selectMaxPrice: Int
     ): Flux<Product> = productService.typeMenuAndPriceLessThen(selectMenuType, selectMaxPrice)
 
 
     @GetMapping("/TypeEqualAndMenuContainAndPriceBtw")
     fun getTypeEqualAndMenuContainAndPriceBtw(
             @RequestParam selectMenuType: TypeMenu,
-                          selectMenu: String,
-                          selectMinPrice: Int,
-                          selectMaxPrice: Int
+            selectMenu: String,
+            selectMinPrice: Int,
+            selectMaxPrice: Int
     ): Flux<Product> = productService.menuTypeEqualAndMenuContainAndPriceBtw(selectMenuType,
                                                                              selectMenu,
                                                                              selectMinPrice,

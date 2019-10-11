@@ -1,11 +1,10 @@
 package com.example.demo.domain.entity
 
+import com.example.demo.domain.Enum.TypeMenu
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import java.time.LocalDateTime
 import javax.persistence.*
-import javax.validation.constraints.NotEmpty
-import javax.validation.constraints.Pattern
 
 @Entity // 엔티티 자바객체를 디비의 테이블과 연결시키는 어노테이션
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class) // 카멜(leeInH), 케밥(lee-inh), 스네이크 케이스(lee_inh)
@@ -18,7 +17,7 @@ data class Product(// class앞에 data를 붙이면 vo객체 역할을 알림
         var menuType : TypeMenu,
         val menu : String,
         var price : Int,
-        
+
         @Column(insertable = false, updatable = false) //이 컬럼을 insert나 update 시킬 때 포함하지않아도 된다 란뜻인듯 데이터베이스쪽에서 알아서한다
         val createdAt : LocalDateTime?,
         @Column(insertable = false, updatable = false)

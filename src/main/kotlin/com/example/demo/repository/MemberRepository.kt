@@ -12,5 +12,8 @@ interface MemberRepository: JpaRepository<Member, Int>{
     fun findByMemberEmailAndMemberNameEquals(memberEmail: String, memberName: String): Member? // 아이디찾기
     fun findByMemberAccountIsLikeAndAndMemberEmailLike(memberAccount: String, memberEmail: String): Member? // 패스워드 찾기
 
+    fun findByMemberAccountEqualsOrMemberPasswdEquals(memberAccount: String, memberPassword: String): Int
+
+
 
 }

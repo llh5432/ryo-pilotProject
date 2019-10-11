@@ -2,6 +2,7 @@ package com.example.demo.exception
 
 import com.fasterxml.jackson.core.JsonParseException
 import javassist.NotFoundException
+import org.hibernate.exception.SQLGrammarException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -32,5 +33,8 @@ object ErrorHandler { //타입이 object인 이유 : 컨트롤러단 안에 있�
         ex.printStackTrace()
         return handleRestException(RestException(httpStatus, "입력 값을 확인해주세요."))
     }
+
+
+
 
 }
