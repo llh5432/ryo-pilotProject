@@ -14,6 +14,10 @@ data class Member (
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val memberId: Int,
 
+
+        @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
+        var orders: List<Order>,
+
         val memberAccount: String,
         val memberPasswd: String,
         val memberEmail: String,
@@ -21,5 +25,7 @@ data class Member (
 
         @Column(insertable = false, updatable = false)
         val memberCreatedAt: LocalDateTime?
+
+
 
 )
