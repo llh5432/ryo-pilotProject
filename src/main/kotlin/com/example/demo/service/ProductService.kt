@@ -35,10 +35,10 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
                             // 찾는 값이 있다면 리턴하고 찾는 값이 없으면 {}이 안의 내용물을 던지라는 것인듯
             }
 
-    fun getAllProduct(): Flux<Product> = Mono
+    fun getAllProduct(): Mono<List<Product>> = Mono
             .fromSupplier {
                 productRepository.findAll()
-            }.flatMapMany { Flux.fromIterable(it) } // flatMapMany는 Mono를 Flux로 바꿔주는 역할을 하는듯 하고 fromIterable 은 파라미터인 it을 flux로 생성해줌 반복해서
+            }// flatMapMany는 Mono를 Flux로 바꿔주는 역할을 하는듯 하고 fromIterable 은 파라미터인 it을 flux로 생성해줌 반복해서
 
 
     fun createProduct(product: Product): Mono<Product> = Mono

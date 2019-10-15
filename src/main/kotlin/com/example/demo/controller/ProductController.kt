@@ -16,7 +16,7 @@ class ProductController ( // 코드의형태는 항상 똑같게, 관행에 따�
 
     // Mapping은 되도록 구분되어 보여질 수 있게
     @GetMapping("/select/all")
-    fun getAllProduct(): Flux<Product> {
+    fun getAllProduct(): Mono<List<Product>> {
         return productService.getAllProduct()
     }
 

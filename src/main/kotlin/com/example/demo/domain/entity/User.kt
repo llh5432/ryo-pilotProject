@@ -1,5 +1,6 @@
 package com.example.demo.domain.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import org.springframework.boot.autoconfigure.security.SecurityProperties
@@ -9,22 +10,22 @@ import javax.persistence.*
 
 @Entity
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
-data class Member (
+data class User (
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val memberId: Int,
+        val userId: Int,
 
+//        @JsonIgnore// json 형태로 쭉 읽다가 무시하고 지나가는 컬럼 없는취급함
+//        @OneToMany(mappedBy = "user", fetch = FetchType.EAGER) // 주종에서 주인의 쪽 테이블이 One ()
+//        var orders: List<Order?>,
 
-        @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
-        var orders: List<Order>,
-
-        val memberAccount: String,
-        val memberPasswd: String,
-        val memberEmail: String,
-        val memberName: String,
+        val userAccount: String,
+        val userPassword: String,
+        val userEmail: String,
+        val userName: String,
 
         @Column(insertable = false, updatable = false)
-        val memberCreatedAt: LocalDateTime?
+        val userCreatedAt: LocalDateTime?
 
 
 

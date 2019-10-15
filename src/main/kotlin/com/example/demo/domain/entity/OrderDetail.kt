@@ -7,6 +7,7 @@ import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
+@Table(name = "order_detail")
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
 data class OrderDetail(
 
@@ -14,25 +15,14 @@ data class OrderDetail(
         @GeneratedValue(strategy = GenerationType.AUTO)
         val orderDetailId : Int,
 
-//        @OneToMany
-//        @JoinColumn(name="order_id")
-//        val order : Order,
-//
-//        @OneToMany
-//        @JoinColumn(name = "product_id")
-//        val product : Product,
-//
-//        @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
-//        @JoinColumn(name = "member_id")
-//        var member : Member,
+        @ManyToOne
+        @JoinColumn(name="order_id")
+        val order : Order,
 
-        var orderDetailAccount : String,
+        @ManyToOne
+        @JoinColumn(name = "product_id")
+        val product : Product,
 
-        var orderDetailType : TypeMenu,
-
-        var orderDetailMenuName : String,
-
-        var orderDetailMenuPrice : Int,
 
         @Column(insertable = false, updatable = false)
         val orderDetailCreatedAt : LocalDateTime

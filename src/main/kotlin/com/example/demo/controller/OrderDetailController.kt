@@ -17,13 +17,8 @@ class OrderDetailController(
         val orderDetailService: OrderDetailService
 ) {
 
-//    @PostMapping("/order/{userId}/{productId}")
-//    fun createOrder(
-//            @PathVariable userId : Int,
-//            @PathVariable productId : Int,
-//            @RequestBody orderDetail: OrderDetail
-//    ): Mono<OrderDetail> {
-//        return orderDetailService.createdOrder(userId, productId, orderDetail)
-//    }
+    @RequestMapping("/orderDetail")
+    fun selectAll():Flux<OrderDetail> =
+            orderDetailService.selectAll()
 
 }

@@ -2,11 +2,9 @@ package com.example.demo.controller
 
 import com.example.demo.domain.entity.Order
 import com.example.demo.service.OrderService
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
 @RestController
 class OrderController(
@@ -17,5 +15,10 @@ class OrderController(
     fun getAllOrderById (): Flux<Order> =
         orderService.getFindAll()
 
+//    @PostMapping("/order/select/{userId}/{productId}")
+//    fun createOrder(
+//            @PathVariable userId : Int,
+//            @PathVariable productId : Int
+//    ): Mono<Order> = orderService.createOrder(userId, productId)
 
 }

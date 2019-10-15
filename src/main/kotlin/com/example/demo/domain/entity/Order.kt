@@ -1,12 +1,11 @@
 package com.example.demo.domain.entity
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import java.time.LocalDateTime
 import javax.persistence.*
 
-@Entity
+@Entity // GET,SET 메서드라고 봄
 @Table(name = "`order`")
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
 data class Order (
@@ -15,12 +14,11 @@ data class Order (
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val orderId: Int,
 
-        @JsonIgnore
-        @ManyToOne
-        @JoinColumn(name="order_member_id")
-        val member : Member,
+//        @JsonIgnore
+        @ManyToOne // 주종에서 종의 테이블이 Many
+        @JoinColumn(name="order_user_id") // 맵핑할 외래키 입력 생략 시 기본전략을 사용 : 필드명 + "_" + 테이블명+id
+        val user : User, //Collection 타입의 객체가 필드에 추가
 
-        val orderAccount: String,
         val orderTotalPrice: Int,
         val orderTotalNum: Int,
 
