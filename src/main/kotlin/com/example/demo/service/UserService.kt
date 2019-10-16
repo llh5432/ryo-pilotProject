@@ -1,16 +1,19 @@
 package com.example.demo.service
 
+import com.auth0.jwt.JWT
+import com.auth0.jwt.JWTCreator
+import com.auth0.jwt.algorithms.Algorithm
 import com.example.demo.domain.entity.User
 import com.example.demo.exception.RestException
 import com.example.demo.interceptor.MyInterceptor
 import com.example.demo.repository.UserRepository
-import org.omg.CORBA.Object
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
-import java.lang.reflect.Constructor
 
 @Service
 class UserService(
@@ -77,15 +80,24 @@ class UserService(
             userPassword : String
     ): Mono<String> = Mono
             .fromSupplier {
-                val result = userRepository.findByUserAccountEqualsAndUserPasswordEquals(userAccount, userPassword)
-                        if (result == null) {
-                            throw RestException(HttpStatus.NOT_FOUND, "아이디 및 패스워드가 틀렸습니다.")
-                        } else {
-
-                            result.userAccount+" 님 login함"
-                        }
+                userRepository.findByUserAccountEqualsAndUserPasswordEquals(userAccount, userPassword)
+                        ?.let { createToken(userAccount) }
+                        ?:throw RestException(HttpStatus.NOT_FOUND, "아이디 및 패스워드가 틀렸습니다.")
             }
 
+    fun createToken(userAccount: String): String{
+        // 아이디 패스워드 체크가 완료 되었을 시에 토큰을 생성해서 토큰 값을 return 해줌
+        val algorithm = Algorithm.HMAC256(myInterceptor.tokenKey) // algorithm 메소드의 HMAC256함수를 사용해서 토큰을 담을 그릇을 만듦(암호화 시킬 key)
 
+        val tokenBuilder = JWT
+                .create() // token builder를 반환함
+                .withIssuer("pilot-project") // 보통 프로젝트명을 적는거같음
+                .withClaim("user", "user") // .WITH 어쩌고 하나씩 PAYLOAD 쪽에 원하는 데이터 추가 할수있음
+        return tokenBuilder.sign(algorithm) // 새로운 JWT를 작성하고 지정된 알고리즘으로 서명함 그리고 return
+    }
+
+    fun searchById(userId: Int): User? {
+        return userRepository.findByIdOrNull(userId)
+    }
 
 }// 서비스 끝

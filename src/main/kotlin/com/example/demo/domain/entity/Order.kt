@@ -12,17 +12,20 @@ data class Order (
 
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val orderId: Int,
+        val orderId: Int = 0,
 
 //        @JsonIgnore
-        @ManyToOne // 주종에서 종의 테이블이 Many
-        @JoinColumn(name="order_user_id") // 맵핑할 외래키 입력 생략 시 기본전략을 사용 : 필드명 + "_" + 테이블명+id
-        val user : User, //Collection 타입의 객체가 필드에 추가
+        @ManyToOne
+        @JoinColumn(name="order_user_id")
+        var user : User,
 
-        val orderTotalPrice: Int,
-        val orderTotalNum: Int,
+        var orderTotalPrice: Int,
+        var orderTotalNum: Int,
+
+        @OneToMany(mappedBy = "order", fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
+        var orderDetails: List<OrderDetail>,
 
         @Column(insertable = false, updatable = false)
-        val orderCreatedAt: LocalDateTime?
+        val orderCreatedAt: LocalDateTime? = null
 
 )

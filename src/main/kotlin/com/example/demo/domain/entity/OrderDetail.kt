@@ -1,6 +1,7 @@
 package com.example.demo.domain.entity
 
 import com.example.demo.domain.Enum.TypeMenu
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import java.time.LocalDateTime
@@ -12,19 +13,21 @@ import javax.persistence.*
 data class OrderDetail(
 
         @Id
-        @GeneratedValue(strategy = GenerationType.AUTO)
-        val orderDetailId : Int,
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        val orderDetailId : Int = 0,
 
+        @JsonIgnore
         @ManyToOne
         @JoinColumn(name="order_id")
-        val order : Order,
+        var order : Order?,
 
-        @ManyToOne
+        @OneToOne
         @JoinColumn(name = "product_id")
         val product : Product,
 
+        val quantity: Int,
 
         @Column(insertable = false, updatable = false)
-        val orderDetailCreatedAt : LocalDateTime
+        val createdAt : LocalDateTime? = null
 
 )

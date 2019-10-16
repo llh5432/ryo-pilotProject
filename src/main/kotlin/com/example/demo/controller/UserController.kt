@@ -16,7 +16,7 @@ class UserController (
     fun selectUserAll(
     ): Flux<User> = userService.selectUserAll()
 
-    @GetMapping("/search/id")
+    @GetMapping("/search/account")
     fun searchAccount(
             @RequestParam userEmail: String,
                            userName: String

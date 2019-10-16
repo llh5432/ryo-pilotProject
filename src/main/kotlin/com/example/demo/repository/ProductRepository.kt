@@ -22,6 +22,7 @@ interface ProductRepository : JpaRepository<Product, Int>{// interface에 미리
 
     fun findByMenuTypeEqualsAndMenuContainingAndPriceBetween(selectMenuType: TypeMenu, selectMenu: String, selectMinPrice: Int, selectMaxPrice: Int): List<Product>
 
+    fun findByProductId(productId : List<Int>): List<Product>
+
 //    @Modifying //이 어노테이션은 insert, update, delete 메서드가 실행됐을 때 몇건의 데이터처리가 실행되었는지를 int 값으로 return해줌
-//    fun deleteByProductId(productId: Int): Int
 }

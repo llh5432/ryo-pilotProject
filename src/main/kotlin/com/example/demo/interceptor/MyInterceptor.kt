@@ -18,18 +18,17 @@ class MyInterceptor: WebFilter { // kotlin 에서 java의 interceptor 대신 Web
     override fun filter(serverWebExchange: ServerWebExchange,
                         webFilterChain: WebFilterChain): Mono<Void> { // void를 리턴함..
         // WebFilter 예외처리..
-        println("WebFilter 예외처리 전")
         if (serverWebExchange.request.path.toString().contains("login")) return webFilterChain.filter(serverWebExchange)
-        println("WebFilter 예외처리 후")
+
         val authorizationHeader = serverWebExchange.request.headers["authorization"]?.get(0) ?: "" // token을 받아옴
         return if (authorizationHeader.isNotEmpty()) { // token이 있다면
             val token = authorizationHeader.replace("Bearer ", "") // tokne 앞의 bearer 을 ""공백으로 지워줌
 
-            try { //try catch 문
+            try {
                 verifier!!.verify(token) // ()안의 token값을 확인해서 decoding된 JWT를 return 함
-            } catch (ex: JWTVerificationException) { // token 인증이 실패하는 error가 발생하면 catch가 잡아줌
+            } catch (ex: JWTVerificationException) {
                 serverWebExchange.response.statusCode = HttpStatus.FORBIDDEN // response 해줌 상태코드는 forbidden으로 403인가
-                return Mono.empty() // return해줌
+                return Mono.empty() //
             }
 
             webFilterChain.filter(serverWebExchange) // 흠..?
@@ -43,9 +42,8 @@ class MyInterceptor: WebFilter { // kotlin 에서 java의 interceptor 대신 Web
     constructor() { // 생성자 : 객체가 생성될 때 자동으로 실행되는 특수 메서드
         val algorithm = Algorithm.HMAC256(tokenKey) // Algorithm클래스의 HMAC256함수를 사용 (secretKey) 새알고리즘을 만들어서 줌 ㄱ걸 변수에 저장
         verifier = JWT.require(algorithm) //
-                .withIssuer("delibird-auth-service")
+                .withIssuer("pilot-project") //issuer는 동일하게....
                 .build() // create
-        println("생성자 안")
     }
 
     var verifier: JWTVerifier? = null // JWTVerifier 클래스가 verify 토큰을 제공해서 주어진 토큰이 올바른지 일치여부를 가려줌
