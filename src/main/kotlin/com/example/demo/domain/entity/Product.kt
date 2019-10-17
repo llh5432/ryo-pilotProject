@@ -1,6 +1,6 @@
 package com.example.demo.domain.entity
 
-import com.example.demo.domain.Enum.TypeMenu
+import com.example.demo.domain.Enum.MenuType
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import java.time.LocalDateTime
@@ -15,7 +15,7 @@ data class Product(// class앞에 data를 붙이면 vo객체 역할을 알림
         val productId : Int = 0, // 변수생성방법 자바스크립트랑 비슷함 [변수 변수이름 : 타입]
 
         @Enumerated(EnumType.STRING)// enum 어노테이션 정의 타입은 string으로 정함
-        var menuType : TypeMenu,
+        var menuType : MenuType,
         val menu : String,
         var price : Int,
 

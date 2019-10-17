@@ -13,7 +13,7 @@ import javax.persistence.*
 data class User (
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val userId: Int,
+        val userId: Int = 0,
 
 //        @JsonIgnore// json 형태로 쭉 읽다가 무시하고 지나가는 컬럼 없는취급함
 //        @OneToMany(mappedBy = "user", fetch = FetchType.EAGER) // 주종에서 주인의 쪽 테이블이 One ()
@@ -25,7 +25,7 @@ data class User (
         val userName: String,
 
         @Column(insertable = false, updatable = false)
-        val userCreatedAt: LocalDateTime?
+        val userCreatedAt: LocalDateTime? = null
 
 
 

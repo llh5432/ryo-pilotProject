@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface OrderRepository: JpaRepository<Order, Int> {
 
+    fun findAllByOrderByOrderCreatedAtDesc(): List<Order>
 }

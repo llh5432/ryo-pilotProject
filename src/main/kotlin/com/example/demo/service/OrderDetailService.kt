@@ -1,48 +1,27 @@
 package com.example.demo.service
 
 import com.example.demo.domain.entity.OrderDetail
+import com.example.demo.exception.RestException
 import com.example.demo.repository.OrderDetailRepository
-import com.example.demo.repository.OrderRepository
-import com.example.demo.repository.ProductRepository
-import com.example.demo.repository.UserRepository
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @Service
 class OrderDetailService (
-        val orderDetailRepository: OrderDetailRepository,
-        val productRepository: ProductRepository,
-        val userRepository: UserRepository,
-        val orderRepository: OrderRepository
+        val orderDetailRepository: OrderDetailRepository
 ) {
 
-    fun selectAll(): Flux<OrderDetail> = Mono
+    fun readAll(): Flux<OrderDetail?> = Mono
             .fromSupplier {
                 orderDetailRepository.findAll()
+            }.onErrorResume {
+                throw RestException(httpStatus = HttpStatus.NOT_FOUND, errMsg = "해당하는 데이터를 찾지 못했습니다.")
             }.flatMapMany {
-                Flux.fromIterable(it)
+                Flux.fromIterable(it!!)
             }
-//    fun createdOrder(
-//            userId : Int,
-//            productId : Int,
-//            orderDetail: OrderDetail
-//    ): Mono<OrderDetail> =
-//            Mono.fromSupplier {
-//                memberRepository.findById(userId)
-//                        .map {
-//                            orderDetail.member = it
-//                            orderDetail.orderDetailAccount = it.memberAccount
-//                        }
-//            }.map {
-//                productRepository.findById(productId).map {
-//                    orderDetail.orderDetailType = it.menuType
-//                    orderDetail.orderDetailMenuName = it.menu
-//                    orderDetail.orderDetailMenuPrice = it.price
-//                }
-//
-//                orderDetailRepository.save(orderDetail)
-//            }
+
 
 
 }

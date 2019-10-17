@@ -7,26 +7,26 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/v1/users")
 class UserController (
         val userService: UserService
 ){
 
-    @GetMapping("/select/all")
-    fun selectUserAll(
-    ): Flux<User> = userService.selectUserAll()
+    @GetMapping
+    fun readAll(
+    ): Flux<User> = userService.readUserAll()
 
     @GetMapping("/search/account")
     fun searchAccount(
             @RequestParam userEmail: String,
                            userName: String
-    ): Mono<String> = userService.selectUserAccount(userEmail, userName)
+    ): Mono<String> = userService.readUserAccount(userEmail, userName)
 
     @GetMapping("/search/password")
     fun searchPassword(
             @RequestParam userAccount : String,
                           userEmail: String
-    ): Mono<String> = userService.selectUserPassword(userAccount, userEmail)
+    ): Mono<String> = userService.readUserPassword(userAccount, userEmail)
 
 
 }

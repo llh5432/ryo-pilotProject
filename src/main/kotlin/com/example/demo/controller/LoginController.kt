@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono
 
 
 @RestController
-@RequestMapping("login")
+@RequestMapping("/api/v1/logins")
 class LoginController (
     val userService : UserService
 ){
@@ -17,15 +17,15 @@ class LoginController (
         return "Login Form"
     }
 
-    @GetMapping("/joinForm")
-    fun testJoinCheck(): String {
+    @GetMapping("/join")
+    fun joinForm(): String {
         return "JoinForm"
     }
 
     @PostMapping("/create")
-        fun createUser(
-                @RequestBody user: User
-        ): Mono<User> = userService.createUser(user)
+    fun createUser(
+            @RequestBody user: User
+    ): Mono<User> = userService.createUser(user)
 
     @PostMapping("/check")
     fun loginCheck(

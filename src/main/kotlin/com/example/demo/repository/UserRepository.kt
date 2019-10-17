@@ -12,7 +12,6 @@ interface UserRepository : JpaRepository<User, Int>{
     fun findByUserEmailIsLike(userEmail: String): User? // 이메일중복방지
     fun findByUserEmailAndUserNameEquals(userEmail: String, userName: String): User? // 아이디찾기
     fun findByUserAccountIsLikeAndAndUserEmailLike(userAccount: String, userEmail: String): User? // 패스워드 찾기
-
     fun findByUserAccountEqualsAndUserPasswordEquals(userAccount: String, userPassword: String): User?
 
 }

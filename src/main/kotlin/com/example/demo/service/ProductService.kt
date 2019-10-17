@@ -1,7 +1,7 @@
 package com.example.demo.service
 
 import com.example.demo.domain.entity.Product
-import com.example.demo.domain.Enum.TypeMenu
+import com.example.demo.domain.Enum.MenuType
 import com.example.demo.exception.RestException
 import com.example.demo.repository.ProductRepository
 import org.springframework.http.HttpStatus
@@ -16,9 +16,20 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
      val productRepository: ProductRepository // @autowired 가 자동으로 생성
 ) {
 
-    fun getMenuEqual(selectMenuType: TypeMenu): Flux<Product> = Mono
+    fun readAll(): Mono<List<Product>> = Mono
             .fromSupplier {
-                 productRepository.findByMenuTypeEquals(selectMenuType)
+                productRepository.
+            }.map {
+                if (it.isNotEmpty()) {
+                    it
+                } else {
+                    throw RestException(HttpStatus.NOT_FOUND, "아직 리스트가 없습니다.")
+                }
+            }
+
+    fun readMenuEqual(menuType: MenuType): Flux<Product> = Mono
+            .fromSupplier {
+                 productRepository.findByMenuTypeEquals(menuType)
             }
             .flatMapMany {
                 if (it.isNotEmpty()) {
@@ -28,28 +39,22 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
                 }
             }
 
-    fun getProductById(productId: Int): Mono<Product> = Mono
+    fun readProductById(productId: Int): Mono<Product> = Mono
             .fromSupplier {
                     productRepository.findById(productId)
                             .orElseThrow { RestException(HttpStatus.NOT_FOUND, "찾는 메뉴가 없습니다.") }
                             // 찾는 값이 있다면 리턴하고 찾는 값이 없으면 {}이 안의 내용물을 던지라는 것인듯
             }
 
-    fun getAllProduct(): Mono<List<Product>> = Mono
-            .fromSupplier {
-                productRepository.findAll()
-            }// flatMapMany는 Mono를 Flux로 바꿔주는 역할을 하는듯 하고 fromIterable 은 파라미터인 it을 flux로 생성해줌 반복해서
-
 
     fun createProduct(product: Product): Mono<Product> = Mono
             .fromSupplier {
-                 productRepository.findByMenuContaining(product.menu) //DB 전체를 찾지말고 그냥 바로 INSERT하는 메뉴이름만 뽑아서 찾아냄
-//                    .filter { it.menu == product.menu } 이렇게하면 필터를 할 필요가 없음
-            }.flatMap {//map 은 안됨
-                if (it.isEmpty()){ // 뽑아낸 it(insert할 menu이름)이 없으면
-                    productRepository.save(product).toMono() // 저장
-                }else { // 있다면
-                    throw RestException(HttpStatus.BAD_REQUEST,"${product.menu} 는 이미 있습니다.") // exception 발생
+                productRepository.findByMenuEquals(product.menu) //DB 전체를 찾지말고 그냥 바로 INSERT하는 메뉴이름만 뽑아서 찾아냄
+            }.map {
+                if (it == 0) {
+                    productRepository.save(product)
+                } else {
+                    throw RestException(HttpStatus.ALREADY_REPORTED, "이미 생성된 메뉴입니다. menu : ${product.menu}")
                 }
             }
 
@@ -70,8 +75,8 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
                         it
                     }
 
-    // ============== JPA Repository쿼리 ====================
-    fun getMenu(selectMenu: String): Flux<Product> = Mono // menu이름이 containing 된 데이터를 List타입으로 select 함
+
+    fun readMenu(selectMenu: String): Flux<Product> = Mono // menu이름이 containing 된 데이터를 List타입으로 select 함
                     .fromSupplier {
                         productRepository.findByMenuContaining(selectMenu)
                     }
@@ -123,7 +128,7 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
                 }
 
     fun typeMenuAndMenuContain(
-            selectMenuType: TypeMenu,
+            selectMenuType: MenuType,
             selectMenu: String
     ): Flux<Product> = Mono
             .fromSupplier {
@@ -138,7 +143,7 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
             }
 
     fun typeMenuAndPriceGreaterThen(
-            selectMenuType: TypeMenu,
+            selectMenuType: MenuType,
             selectMinPrice: Int
     ): Flux<Product> = Mono
             .fromSupplier {
@@ -153,7 +158,7 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
             }
 
     fun typeMenuAndPriceLessThen(
-            selectMenuType: TypeMenu,
+            selectMenuType: MenuType,
             selectMaxPrice: Int
     ): Flux<Product> = Mono
             .fromSupplier {
@@ -168,7 +173,7 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
             }
 
     fun menuTypeEqualAndMenuContainAndPriceBtw( // 메뉴타입 eq 메뉴 contain 가격 btw 안쓰임
-            selectMenuType: TypeMenu,
+            selectMenuType: MenuType,
             selectMenu: String,
             selectMinPrice: Int,
             selectMaxPrice: Int

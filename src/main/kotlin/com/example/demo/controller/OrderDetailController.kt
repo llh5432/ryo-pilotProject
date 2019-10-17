@@ -13,12 +13,13 @@ import reactor.core.publisher.Mono
 import javax.validation.Valid
 
 @RestController
+@RequestMapping("/api/v1/orderDetails")
 class OrderDetailController(
         val orderDetailService: OrderDetailService
 ) {
 
-    @RequestMapping("/orderDetail")
-    fun selectAll():Flux<OrderDetail> =
-            orderDetailService.selectAll()
+    @RequestMapping
+    fun readAll():Flux<OrderDetail?> =
+            orderDetailService.readAll()
 
 }

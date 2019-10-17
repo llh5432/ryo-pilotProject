@@ -40,7 +40,7 @@ class UserService(
     }
 
 
-    fun selectUserAll(): Flux<User> = Mono
+    fun readUserAll(): Flux<User> = Mono
             .fromSupplier {
                 userRepository.findAll()
             }
@@ -52,7 +52,7 @@ class UserService(
                 }
             }
 
-    fun selectUserAccount(
+    fun readUserAccount(
             userEmail: String,
             userName: String
     ): Mono<String> {
@@ -64,7 +64,7 @@ class UserService(
         }
     }
 
-    fun selectUserPassword(
+    fun readUserPassword(
             userAccount: String,
             userEmail: String
     ): Mono<String> {
@@ -96,8 +96,8 @@ class UserService(
         return tokenBuilder.sign(algorithm) // 새로운 JWT를 작성하고 지정된 알고리즘으로 서명함 그리고 return
     }
 
-    fun searchById(userId: Int): User? {
-        return userRepository.findByIdOrNull(userId)
+    fun searchById(userId: Int): User? { //리턴 값으로 nullable체크
+        return userRepository.findByIdOrNull(userId) //findBytId 가 없다면 null을 가져옴 nullable한 기능
     }
 
 }// 서비스 끝

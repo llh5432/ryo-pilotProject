@@ -1,6 +1,6 @@
 package com.example.demo.domain.Enum
 
-enum class TypeMenu {
+enum class MenuType {
     KR,
     JP,
     CN,
