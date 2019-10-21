@@ -22,13 +22,13 @@ data class OrderDetail(
         // 그러나 back end에서 순서는 order 빈객체를 만들고 일단 저장 -> order detail 객체를 만들고 -> order 저장하고 -> order detail 저장 완료 끝
         // 여기서 단순히 orderId 즉 order pk가 필요하니까 다른 데이터들은 채워지지않을수있으니 nullAble 해둠
 
-        @OneToOne // 주문상세 테이블과 상품 테이블은 1:1 관계 하나의 주문상세필드에는 하나의 상품이 들어감
+        @OneToOne // detail테이블과 product테이블은 하나의 detail에 하나의 product 데이터가 들어감 그래서 oneToOne 관계
         @JoinColumn(name = "product_id")
         val product : Product,
 
         val quantity: Int,
 
-        val total: Int? = 0,
+        val total: Int? = 0, // 초기화
 
         @Column(insertable = false, updatable = false)
         val createdAt : LocalDateTime? = null // 이것도 마찬가지 null

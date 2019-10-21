@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository
 @Repository
 interface ProductRepository : JpaRepository<Product, Int>{// interface에 미리 JpaReopository메서드를 정의해둔것   <entityClass, pk>
 
-    fun findByP
     fun findByMenuContaining(select : String): List<Product> // 포함된 글자 찾는 쿼리
     fun findByMenuEquals(menu: String): Int
 

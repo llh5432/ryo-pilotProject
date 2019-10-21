@@ -10,17 +10,17 @@ import javax.validation.constraints.NotNull
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
 data class OrderForm (
         @get:NotEmpty
-        val orderTuples : List<OrderTuple> // 메뉴 하나씩 추가할 때마다 늘어갈 list 쪽
+        val orderTuples : List<OrderTuple> // View단에서 담은 최종 데이터 List를 orderTuples
 )
 
 data class OrderTuple( // 이 데이터객체는 foot컴포넌트 한 줄을 보여줄거임 (주문메뉴, 가격, 수량)
 
-        @get:NotNull
-        val product: Product, // 메뉴이름, 가격
+        @get:NotNull // validation not null
+        val product: Product, // 메뉴이름, 가격이 포함되있으니 Product객체를 생성
 
         @get:Min(value = 0L, message = "수량을 확인하세요.")
-        val quantity: Int, // 수량
+        val quantity: Int, // 수량 OrderDetail 테이블과 Order테이블에 들어갈 컬럼
 
         @get:NotNull
-        val total: Int
+        val total: Int // ''
 )

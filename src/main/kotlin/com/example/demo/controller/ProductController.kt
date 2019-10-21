@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
-@Controller
+@RestController
 @RequestMapping("/api/v1/products") // 전체 /api맵핑으로 한번 감쌈
 class ProductController ( // 코드의형태는 항상 똑같게, 관행에 따라 테이블명+Controller
         val productService: ProductService // @autowired productService = ProductService;  이거라고 생각하면 됨
@@ -16,7 +16,7 @@ class ProductController ( // 코드의형태는 항상 똑같게, 관행에 따�
 
     // Mapping은 되도록 구분되어 보여질 수 있게
     @GetMapping
-    fun readAll(): Mono<List<Product>> = productService.readAll()
+    fun readAll(): Flux<Product> = productService.readProductAll()
 
 
     @GetMapping("/menuType")
@@ -66,54 +66,4 @@ class ProductController ( // 코드의형태는 항상 똑같게, 관행에 따�
             @RequestParam menu: String
     ): Flux<Product> = productService.readMenu(menu)
 
-
-//    @GetMapping("/GreaterThenPrice")
-//    fun getGreaterThenPrice(
-//            @RequestParam selectMinPrice: Int
-//    ): Flux<Product> = productService.priceGreaterThen(selectMinPrice)
-//
-//
-//    @GetMapping("/LessThenPrice")
-//    fun getLessThenPrice(
-//            @RequestParam selectMaxPrice: Int
-//    ): Flux<Product> = productService.priceLessThen(selectMaxPrice)
-
-
-//    @GetMapping("/PriceBtw")
-//    fun getPriceBetween(
-//            @RequestParam selectMinPrice: Int,
-//                          selectMaxPrice: Int
-//    ): Flux<Product> = productService.priceBetween(selectMinPrice, selectMaxPrice)
-
-
-//    @GetMapping("/TypeMenuAndMenuContain")
-//    fun getTypeMenuAndMenuContaion(
-//            @RequestParam selectMenuType: TypeMenu,
-//            selectMenu: String
-//    ): Flux<Product> = productService.typeMenuAndMenuContain(selectMenuType, selectMenu)
-//
-//    @GetMapping("/TypeMenuAndPriceGreaterThen")
-//    fun getTypeMenuAndPriceGreaterThen(
-//            @RequestParam selectMenuType: TypeMenu,
-//            selectMinPrice: Int
-//    ): Flux<Product> = productService.typeMenuAndPriceGreaterThen(selectMenuType, selectMinPrice)
-//
-//    @GetMapping("/TypeMenuAndPriceLessThen")
-//    fun getTypeMenuAndPriceLessThen(
-//            @RequestParam selectMenuType: TypeMenu,
-//            selectMaxPrice: Int
-//    ): Flux<Product> = productService.typeMenuAndPriceLessThen(selectMenuType, selectMaxPrice)
-//
-//
-//    @GetMapping("/TypeEqualAndMenuContainAndPriceBtw")
-//    fun getTypeEqualAndMenuContainAndPriceBtw(
-//            @RequestParam selectMenuType: TypeMenu,
-//            selectMenu: String,
-//            selectMinPrice: Int,
-//            selectMaxPrice: Int
-//    ): Flux<Product> = productService.menuTypeEqualAndMenuContainAndPriceBtw(selectMenuType,
-//                                                                             selectMenu,
-//                                                                             selectMinPrice,
-//                                                                             selectMaxPrice
-//    )
 }

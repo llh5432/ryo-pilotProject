@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toMono
 
 
 @Service // 서비스어노테이션
@@ -16,16 +15,17 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
      val productRepository: ProductRepository // @autowired 가 자동으로 생성
 ) {
 
-    fun readAll(): Mono<List<Product>> = Mono
+    fun readProductAll(): Flux<Product> = Mono
             .fromSupplier {
-                productRepository.
-            }.map {
+                productRepository.findAll()
+            }.flatMapMany {
                 if (it.isNotEmpty()) {
-                    it
+                    Flux.fromIterable(it)
                 } else {
-                    throw RestException(HttpStatus.NOT_FOUND, "아직 리스트가 없습니다.")
+                    throw RestException(HttpStatus.NOT_FOUND, "상품이 업습니다.")
                 }
             }
+
 
     fun readMenuEqual(menuType: MenuType): Flux<Product> = Mono
             .fromSupplier {
@@ -88,104 +88,5 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
                 }
             }
 
-
-    fun priceGreaterThen(selectMinPrice: Int): Flux<Product> = Mono
-            .fromSupplier {
-                productRepository.findByPriceGreaterThanEqual(selectMinPrice)
-            }
-            .flatMapMany {
-                if (it.isNotEmpty()) {
-                    Flux.fromIterable(it)
-                }else {
-                    throw RestException(HttpStatus.NOT_FOUND, "$selectMinPrice 원 이상의 메뉴가 없습니다.")
-                }
-            }
-
-    fun priceLessThen(selectMaxPrice: Int): Flux<Product> = Mono
-            .fromSupplier {
-                productRepository.findByPriceLessThanEqual(selectMaxPrice)
-            }
-            .flatMapMany {
-                if (it.isNotEmpty()) {
-                    Flux.fromIterable(it)
-                }else {
-                    throw RestException(HttpStatus.NOT_FOUND, "$selectMaxPrice 원 이하의 메뉴가 없습니다.")
-                }
-            }
-
-    fun priceBetween(
-            selectMinPrice: Int,
-            selectMaxPrice: Int): Flux<Product> = Mono
-                .fromSupplier {
-                    productRepository.findByPriceBetween(selectMinPrice, selectMaxPrice)
-                }
-                .flatMapMany {
-                    if (it.isNotEmpty()) {
-                        Flux.fromIterable(it)
-                    }else {
-                        throw RestException(HttpStatus.NOT_FOUND, "$selectMinPrice 원 이상 $selectMaxPrice 원 이하의 메뉴가 없습니다.")
-                    }
-                }
-
-    fun typeMenuAndMenuContain(
-            selectMenuType: MenuType,
-            selectMenu: String
-    ): Flux<Product> = Mono
-            .fromSupplier {
-                productRepository.findByMenuTypeEqualsAndMenuContaining(selectMenuType, selectMenu)
-            }
-            .flatMapMany {
-                if (it.isNotEmpty()) {
-                    Flux.fromIterable(it)
-                }else {
-                    throw RestException(HttpStatus.NOT_FOUND, "$selectMenuType , $selectMenu 포함된 메뉴가 없습니다.")
-                }
-            }
-
-    fun typeMenuAndPriceGreaterThen(
-            selectMenuType: MenuType,
-            selectMinPrice: Int
-    ): Flux<Product> = Mono
-            .fromSupplier {
-                productRepository.findByMenuTypeEqualsAndPriceGreaterThanEqual(selectMenuType, selectMinPrice)
-            }
-            .flatMapMany {
-                if (it.isNotEmpty()) {
-                    Flux.fromIterable(it)
-                }else {
-                    throw RestException(HttpStatus.NOT_FOUND, "$selectMenuType, $selectMinPrice 원 이상인 메뉴가 없습니다.")
-                }
-            }
-
-    fun typeMenuAndPriceLessThen(
-            selectMenuType: MenuType,
-            selectMaxPrice: Int
-    ): Flux<Product> = Mono
-            .fromSupplier {
-                productRepository.findByMenuTypeEqualsAndPriceLessThanEqual(selectMenuType, selectMaxPrice)
-            }
-            .flatMapMany {
-                if (it.isNotEmpty()) {
-                    Flux.fromIterable(it)
-                }else {
-                    throw RestException(HttpStatus.NOT_FOUND, "$selectMenuType, $selectMaxPrice 원 이하인 메뉴가 없습니다.")
-                }
-            }
-
-    fun menuTypeEqualAndMenuContainAndPriceBtw( // 메뉴타입 eq 메뉴 contain 가격 btw 안쓰임
-            selectMenuType: MenuType,
-            selectMenu: String,
-            selectMinPrice: Int,
-            selectMaxPrice: Int
-    ): Flux<Product> = Mono
-            .fromSupplier {
-                productRepository.findByMenuTypeEqualsAndMenuContainingAndPriceBetween(selectMenuType, selectMenu, selectMinPrice, selectMaxPrice)
-            }.flatMapMany {
-                if (it.isNotEmpty()) {
-                    Flux.fromIterable(it)
-                }else {
-                    throw RestException(HttpStatus.NOT_FOUND, "타입이 $selectMenuType , 메뉴에 $selectMenu 가 포함, $selectMinPrice ~ $selectMaxPrice 원 메뉴가 없습니다.")
-                }
-            }
-
-}// service끝
+}
+// service끝

@@ -1,10 +1,7 @@
 package com.example.demo.domain.entity
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
-import org.springframework.boot.autoconfigure.security.SecurityProperties
-import java.sql.Timestamp
 import java.time.LocalDateTime
 import javax.persistence.*
 
