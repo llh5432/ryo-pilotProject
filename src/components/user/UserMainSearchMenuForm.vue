@@ -1,5 +1,5 @@
 <template>
-        <b-container fluid>
+        <b-container>
             <!-- User Interface controls -->
             <b-row align-h="end">
                 <b-card class="border-secondary">
@@ -109,14 +109,7 @@
                 </b-col>
 
                 <b-col sm="7" md="6" class="my-1">
-                    <b-pagination
-                            v-model="currentPage"
-                            :total-rows="totalRows"
-                            :per-page="perPage"
-                            align="fill"
-                            size="sm"
-                            class="my-0"
-                    ></b-pagination>
+
                 </b-col>
             </b-row>
 
@@ -158,6 +151,15 @@
                 </template>
             </b-table>
 
+            <MainBodyOrderListForm></MainBodyOrderListForm>
+
+            <b-pagination
+                    v-model="currentPage"
+                    :total-rows="totalRows"
+                    :per-page="perPage"
+                    align="center"
+                    class="my-0"
+            ></b-pagination>
             <!-- Info modal -->
             <b-modal :id="infoModal.id" :title="infoModal.title" ok-only @hide="resetInfoModal">
                 <pre>{{ infoModal.content }}</pre>
@@ -166,7 +168,9 @@
 </template>
 
 <script>
+    import MainBodyOrderListForm from "@/components/user/UserMainSlotForm";
     export default {
+        components: {MainBodyOrderListForm},
         data() {
             return {
                 items: [

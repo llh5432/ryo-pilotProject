@@ -4,13 +4,13 @@
             <div id="login">
                 <b-card id="cardSet" >
                     <form>
-                        <label>Password 찾기</label>
-                        <b-form-input type="text" placeholder="Account"/><br>
-                        <b-form-input type="email" placeholder="Email"/><br>
-                        <router-link to="/">
-                            <b-button variant="outline-primary">돌아가기</b-button>
-                        </router-link>
-                        <b-button id="lBtnSet" variant="outline-primary">찾 기</b-button><br>
+                        <label>Account 찾기</label>
+                        <b-form-input type="text" placeholder="Email"/><br>
+                        <b-form-input type="text" placeholder="Name"/><br>
+                        <b-button-group>
+                            <b-button variant="outline-primary" to="/">돌아가기</b-button>
+                            <b-button id="lBtnSet" variant="outline-primary" to="/">찾 기</b-button>
+                        </b-button-group>
                     </form>
                 </b-card>
             </div>
@@ -20,7 +20,9 @@
 
 <script>
     export default {
-        name: "SearchPasswordForm",
+        name: "SearchAccountForm",
+
+
     }
 </script>
 

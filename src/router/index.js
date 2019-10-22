@@ -1,16 +1,17 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import LoginForm from "@/components/LoginForm";
-import JoinForm from "@/components/JoinForm";
-import SearchAccountForm from "@/components/SearchAccountForm";
-import SearchPasswordForm from "@/components/SearchPasswordForm";
-import MainSideForm from "@/components/MainSideForm";
-import MainHeaderForm from "@/components/MainHeaderForm";
-import MainBodyMenuForm from "@/components/MainBodyMenuForm";
+import LoginForm from "@/components/login/LoginForm";
+import JoinForm from "@/components/login/JoinForm";
+import SearchAccountForm from "@/components/login/SearchAccountForm";
+import SearchPasswordForm from "@/components/login/SearchPasswordForm";
+import UserMainForm from "@/components/user/UserMainForm";
+import UserMainProductForm from "@/components/user/UserMainProductForm";
+import AdminMainForm from "@/components/admin/AdminMainForm";
+import AdminMenuDetailForm from "@/components/admin/AdminMenuDetailForm";
 
 Vue.use(VueRouter)
-Vue.component('main-header',{
-    MainHeaderForm
+Vue.component('user-main',{
+    UserMainForm
 })
 export const router = new VueRouter({
     routes:[
@@ -31,16 +32,20 @@ export const router = new VueRouter({
             component:SearchPasswordForm
         },
         {
-            path:'/mainSide',
-            component:MainSideForm
-        },
-        {
-            path:'/mainHeader',
-            component:MainHeaderForm
+            path:'/userMain',
+            component:UserMainForm
         }
         ,{
-            path:'/mainBody',
-            component:MainBodyMenuForm
+            path:'/product',
+            component:UserMainProductForm
+        }
+        ,{
+            path:'/adminMain',
+            component:AdminMainForm
+        },
+        {
+            path:'/adminProductDetail',
+            component:AdminMenuDetailForm
         }
     ]
 })

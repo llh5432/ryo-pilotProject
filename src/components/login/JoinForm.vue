@@ -5,19 +5,18 @@
             <div id="login">
                 <b-card id="cardSet" >
                     <form id="formSet">
-                        <label>회원가입하세요.</label>
+                        <label>간단한 회원가입</label>
                         <div id="formBodySet">
                             <b-form-input type="text" placeholder="Account"/><br>
                             <b-form-input type="password" placeholder="Password"/><br>
-                            <b-form-input type="password" placeholder="PasswordDup"/><br>
                             <b-form-input type="email" placeholder="Email"/><br>
-                            <b-form-input type="text" placeholder="text"/>
+                            <b-form-input type="text" placeholder="Name"/><br>
                         </div>
                         <div id="formFootSet">
-                            <router-link to="/">
-                                <b-button variant="outline-primary">돌아가기</b-button>
-                            </router-link>
-                            <b-button variant="outline-primary">가입</b-button><br>
+                            <b-button-group>
+                                <b-button variant="outline-primary" to="/">돌아가기</b-button>
+                                <b-button variant="outline-primary" to="/">가입</b-button>
+                            </b-button-group>
                         </div>
                     </form>
                 </b-card>
