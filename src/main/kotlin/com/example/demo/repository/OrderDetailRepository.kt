@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface OrderDetailRepository : JpaRepository<OrderDetail, Int>{
 
+
 }

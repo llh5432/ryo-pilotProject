@@ -1,12 +1,13 @@
 package com.example.demo.service
 
+
 import com.example.demo.domain.dao.OrderForm
+import com.example.demo.domain.dao.TopUser
 import com.example.demo.domain.entity.Order
 import com.example.demo.domain.entity.OrderDetail
 import com.example.demo.exception.RestException
 import com.example.demo.repository.OrderDetailRepository
 import com.example.demo.repository.OrderRepository
-import com.example.demo.repository.ProductRepository
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -30,6 +31,13 @@ class OrderService(
                 }
             }.flatMapMany {
                 Flux.fromIterable(it!!)
+            }
+
+    fun readOrderById(userId: Int): Flux<Order> = Mono
+            .fromSupplier {
+                orderRepository.findAllByUserUserId(userId)
+            }.flatMapMany {
+                it?.let { Flux.fromIterable(it) }?: throw RestException(HttpStatus.NOT_FOUND, "아직 오더가 없습니다.")
             }
 
 
@@ -70,6 +78,30 @@ class OrderService(
                 order.orderDetails = orderDetailRepository.saveAll(orderDetails) //saveAll은 데이터베이스에 보류중인 모든변경사항을 flush시켜줌
                     orderRepository.save(order)
             }
+
+        fun test(): Int? { // 테스트
+            return orderRepository.findAll().groupBy { it.user.userId }.map {
+                it.value.sumBy { it.orderTotalPrice }
+            }.map { it }.max()
+        }
+
+        fun test2(): TopUser { // 테스트 완료
+            var result1 = orderRepository.findAll().groupBy { it.user.userId }
+                    .map {
+                        it.value.sumBy { it.orderTotalPrice }
+                        }.map { it }.max()
+
+            var result2 = orderRepository.findAll().groupBy { it.user.userId }.maxBy { it.value.sumBy { order -> order.orderTotalPrice } }
+
+            if (result2 != null) {
+                return TopUser(
+                        topUserAccount = result2.value.get(1).user.userAccount,
+                        total = result1
+                )
+            }
+        }
+
+
 
 
 }

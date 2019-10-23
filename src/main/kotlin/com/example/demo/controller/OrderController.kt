@@ -1,6 +1,7 @@
 package com.example.demo.controller
 
 import com.example.demo.domain.dao.OrderForm
+import com.example.demo.domain.dao.TopUser
 import com.example.demo.domain.entity.Order
 import com.example.demo.service.OrderService
 import org.springframework.web.bind.annotation.*
@@ -17,11 +18,24 @@ class OrderController(
     @GetMapping
     fun readAll(): Flux<Order> = orderService.readFindAll()
 
+    @GetMapping("/order/{userId}")
+    fun readOrderByUserId(@PathVariable userId: Int): Flux<Order> = orderService.readOrderById(userId)
+
     @PostMapping("/{userId}")
     fun create( // 함수명은 간결하고 명확한 의미가 담긴것으로 명사형이 좋고 어쩔 수 없을 때 동사를 섞기도함
             @PathVariable userId : Int, // 테스트를 위해서 일단 계정pk를 손수 적음 실제론 front에서 cookie로 처리하는 듯
             @RequestBody @Valid orderForm : OrderForm // 입력받을 객체폼을 하나 만듦 Foot컴포넌트 부분 (Product, quantity(수량)이 들어갈 폼)
     ): Mono<Order> = orderService.createOrder(userId, orderForm)
+
+    @GetMapping("/test")
+    fun test(): Int? {
+        return orderService.test()
+    }
+
+    @GetMapping("/test2")
+    fun test2(): TopUser {
+        return orderService.test2()
+    }
 
 
 }

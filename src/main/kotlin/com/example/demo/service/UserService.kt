@@ -55,14 +55,12 @@ class UserService(
     fun readUserAccount(
             userEmail: String,
             userName: String
-    ): Mono<String> {
-        val account = userRepository.findByUserEmailAndUserNameEquals(userEmail, userName)
-        if (account == null) {
-            throw RestException(HttpStatus.NOT_FOUND, "$userEmail , $userName 으로 찾은 ID가 없습니다.")
-        } else {
-            return account.userAccount.toMono()
-        }
-    }
+    ): Mono<String> = Mono
+            .fromSupplier {
+                userRepository.findByUserEmailAndUserNameEquals(userEmail, userName)
+                        ?.userAccount
+                        ?: throw RestException(HttpStatus.NOT_FOUND, "$userEmail , $userName 으로 찾은 ID가 없습니다.")
+            }
 
     fun readUserPassword(
             userAccount: String,

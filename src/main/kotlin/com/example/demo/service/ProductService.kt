@@ -19,11 +19,9 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
             .fromSupplier {
                 productRepository.findAll()
             }.flatMapMany {
-                if (it.isNotEmpty()) {
+                it?.let {
                     Flux.fromIterable(it)
-                } else {
-                    throw RestException(HttpStatus.NOT_FOUND, "상품이 업습니다.")
-                }
+                }?: throw RestException(HttpStatus.NOT_FOUND, "상품이 없습니다.")
             }
 
 
@@ -32,11 +30,9 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
                  productRepository.findByMenuTypeEquals(menuType)
             }
             .flatMapMany {
-                if (it.isNotEmpty()) {
+                it?.let {
                     Flux.fromIterable(it)
-                }else {
-                    throw RestException(HttpStatus.NOT_FOUND,"아직 생성된 리스트가 없습니다.")
-                }
+                }?: throw RestException(HttpStatus.NOT_FOUND, "아직 생성된 리스트가 없습니다. menuType : $menuType")
             }
 
     fun readProductById(productId: Int): Mono<Product> = Mono

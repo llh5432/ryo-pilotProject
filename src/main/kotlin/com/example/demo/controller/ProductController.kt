@@ -3,7 +3,6 @@ package com.example.demo.controller
 import com.example.demo.domain.Enum.MenuType
 import com.example.demo.domain.entity.Product
 import com.example.demo.service.ProductService
-import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -25,10 +24,10 @@ class ProductController ( // 코드의형태는 항상 똑같게, 관행에 따�
     ): Flux<Product> = productService.readMenuEqual(menuType)
 
 
-    @GetMapping("/menuType/{menuType}")
-    fun readMenuTypeEqual(
-            @PathVariable menuType: MenuType
-    ): Flux<Product> = productService.readMenuEqual(menuType)
+//    @GetMapping("/menuType/{menuType}")
+//    fun readMenuTypeEqual(
+//            @PathVariable menuType: MenuType
+//    ): Flux<Product> = productService.readMenuEqual(menuType)
 
 
     @GetMapping("/read/{productId}")
