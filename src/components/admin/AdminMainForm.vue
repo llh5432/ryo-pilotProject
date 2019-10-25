@@ -75,6 +75,8 @@
     import AdminMenuDeleteForm from "@/components/admin/AdminMenuDeleteForm";
     import AdminUserListForm from "@/components/admin/AdminUserListForm";
     import AdminOrderListForm from "@/components/admin/AdminOrderListForm";
+
+
     export default {
         name: "AdminMainForm",
         components: {AdminMenuDeleteForm, AdminMenuCUForm, AdminDashBoardForm, AdminOrderListForm, AdminUserListForm}

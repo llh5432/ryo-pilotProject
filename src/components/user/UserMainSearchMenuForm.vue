@@ -113,6 +113,7 @@
                 </b-col>
             </b-row>
 
+
             <!-- Main table element -->
             <b-table
                     show-empty
@@ -151,8 +152,6 @@
                 </template>
             </b-table>
 
-            <MainBodyOrderListForm></MainBodyOrderListForm>
-
             <b-pagination
                     v-model="currentPage"
                     :total-rows="totalRows"
@@ -160,6 +159,10 @@
                     align="center"
                     class="my-0"
             ></b-pagination>
+
+            <MainBodyOrderListForm></MainBodyOrderListForm>
+
+
             <!-- Info modal -->
             <b-modal :id="infoModal.id" :title="infoModal.title" ok-only @hide="resetInfoModal">
                 <pre>{{ infoModal.content }}</pre>

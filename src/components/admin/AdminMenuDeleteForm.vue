@@ -8,7 +8,7 @@
                 id="my-table"
                 :per-page="perPage"
                 :current-page="currentPage"
-                small
+
                 ref="selectableTable"
                 selectable
                 :select-mode="selectMode"
@@ -52,7 +52,7 @@
             return {
                 perPage: 3,
                 currentPage: 1,
-                modes: ['multi', 'single', 'range'],
+                modes: ['multi', 'single', 'ran ge'],
                 fields: ['selected', 'isActive', 'age', 'first_name', 'last_name'],
                 items: [
                     { isActive: true, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
