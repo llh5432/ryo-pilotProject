@@ -1,5 +1,6 @@
 package com.example.demo.service
 
+import com.example.demo.domain.dao.TopMenu
 import com.example.demo.domain.entity.OrderDetail
 import com.example.demo.exception.RestException
 import com.example.demo.repository.OrderDetailRepository
@@ -22,6 +23,25 @@ class OrderDetailService (
                 Flux.fromIterable(it!!)
             }
 
+    fun test1(): Int?{
+
+       return  orderDetailRepository.findAll().groupBy { it.product.productId }
+                .map {
+                    it.value.sumBy { orderDetail ->  orderDetail.total!! }
+                }.map {
+                   it
+                }.max()
+    }
+
+//    fun test2(): String {
+//        val result =  orderDetailRepository.findAll().groupBy { it.product.productId }
+//
+//        val maxPrice = result.map {
+//            it.value.sumBy { orderDetail -> orderDetail.total!! }
+//        }.max()
+//
+//        val topMenuName = result.map { it.value.sumBy { orderDetail ->  } }
+//    }
 
 
 }

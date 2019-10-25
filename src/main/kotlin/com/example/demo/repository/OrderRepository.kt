@@ -13,5 +13,5 @@ interface OrderRepository: JpaRepository<Order, Int> {
 //    fun findByOrderTotalPrice(): List<Int>
     // 유저id들을 그룹화해서 그 그룹들중 가장 totalprice가 높은 유저를 뽑음
 //    @Query("select ")
-
+//    fun findOrderByOrderTotalPrice():List<Int>
 }

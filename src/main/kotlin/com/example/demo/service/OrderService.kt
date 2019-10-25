@@ -1,23 +1,23 @@
 package com.example.demo.service
 
 
-import com.example.demo.domain.dao.OrderForm
-import com.example.demo.domain.dao.TopUser
+import com.example.demo.domain.Enum.MenuType
+import com.example.demo.domain.dao.*
 import com.example.demo.domain.entity.Order
 import com.example.demo.domain.entity.OrderDetail
 import com.example.demo.exception.RestException
 import com.example.demo.repository.OrderDetailRepository
 import com.example.demo.repository.OrderRepository
+import com.example.demo.repository.UserRepository
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-
-
 @Service
 class OrderService(
         val orderRepository: OrderRepository,
         val orderDetailRepository: OrderDetailRepository,
+        val userRepository: UserRepository,
         val userService: UserService
 ) {
 
@@ -37,7 +37,7 @@ class OrderService(
             .fromSupplier {
                 orderRepository.findAllByUserUserId(userId)
             }.flatMapMany {
-                it?.let { Flux.fromIterable(it) }?: throw RestException(HttpStatus.NOT_FOUND, "아직 오더가 없습니다.")
+                it?.let { Flux.fromIterable(it) } ?: throw RestException(HttpStatus.NOT_FOUND, "아직 오더가 없습니다.")
             }
 
 
@@ -51,11 +51,12 @@ class OrderService(
             }.map {
 
                 // orderDetail에 저장할 객체를 만듦
-                val orderDetails = orderForm.orderTuples.map { orderTuple ->    //foot 컴포넌트 tuple 만드는 객체 생성
+                val orderDetails = orderForm.orderTuples.map { orderTuple ->
+                    //foot 컴포넌트 tuple 만드는 객체 생성
                     OrderDetail( // orderDetail 생성자 완성
                             order = null,
                             product = orderTuple.product,
-                            quantity= orderTuple.quantity,
+                            quantity = orderTuple.quantity,
                             total = orderTuple.product.price.times(orderTuple.quantity)
                     )
                 }
@@ -71,38 +72,101 @@ class OrderService(
                 )
                 orderRepository.save(order) // 먼저 order를 저장해서 ordeId를 생성시켜야 orderDetail에 있는 orderId가 충족되어서 저장시킬수있음
 
-                orderDetails.forEach {// 반복문 실행해서 orderDetail안에 있는 order를 위에 완성시킨 order로 대입
+                orderDetails.forEach {
+                    // 반복문 실행해서 orderDetail안에 있는 order를 위에 완성시킨 order로 대입
                     it.order = order
                 }
                 //
                 order.orderDetails = orderDetailRepository.saveAll(orderDetails) //saveAll은 데이터베이스에 보류중인 모든변경사항을 flush시켜줌
-                    orderRepository.save(order)
+                orderRepository.save(order)
             }
 
-        fun test(): Int? { // 테스트
-            return orderRepository.findAll().groupBy { it.user.userId }.map {
-                it.value.sumBy { it.orderTotalPrice }
-            }.map { it }.max()
-        }
 
-        fun test2(): TopUser { // 테스트 완료
-            var result1 = orderRepository.findAll().groupBy { it.user.userId }
-                    .map {
-                        it.value.sumBy { it.orderTotalPrice }
-                        }.map { it }.max()
+    fun topUser(): Mono<TopUser> = Mono
+            .fromSupplier {
+                orderRepository.findAll()
+                        .groupBy { it.user.userId }
+                        .maxBy { it.value.sumBy { order -> order.orderTotalPrice } }
 
-            var result2 = orderRepository.findAll().groupBy { it.user.userId }.maxBy { it.value.sumBy { order -> order.orderTotalPrice } }
-
-            if (result2 != null) {
-                return TopUser(
-                        topUserAccount = result2.value.get(1).user.userAccount,
-                        total = result1
+            }.map {
+                TopUser(
+                        topUserAccount = it!!.value[0].user.userAccount,
+                        total = it.value.sumBy { order -> order.orderTotalPrice }
                 )
             }
-        }
 
 
+    fun topMenu(): Mono<TopMenu> = Mono
+            .fromSupplier {
+                orderDetailRepository.findAll()
+                        .groupBy { it.product.productId } // 공통적으로 필요한 변수
+                        .maxBy { it.value.sumBy { orderDetail -> orderDetail.total } }
+            }.map {
+                TopMenu(
+                        topMenu = it!!.value[0].product.menu,
+                        total = it.value[0].total
+                )
+            }
 
+    fun topType(): Mono<TopType> = Mono
+            .fromSupplier {
+                orderDetailRepository.findAll()
+                        .groupBy { it.product.menuType }
+                        .maxBy { it.value.sumBy { orderDetail -> orderDetail.total } }
+            }.map {
+                TopType(
+                        topType = MenuType.valueOf(it!!.key.name),
+                        total = it.value.sumBy { orderDetail -> orderDetail.total }
+                )
+            }
+
+    fun userCount(): Mono<Int> = Mono
+            .fromSupplier {
+                userRepository.findAll().size
+            }
+
+    fun orderCount(): Mono<Int> = Mono
+            .fromSupplier {
+                orderRepository.findAll().size
+            }
+
+    fun orderTotal(): Mono<Int> = Mono
+            .fromSupplier {
+                orderRepository.findAll().sumBy { it.orderTotalPrice }
+            }
+
+    fun getDashBoard(): Mono<DashBoard> = topUser() // Mono타입을 리턴함
+            .zipWith(topMenu()) // .zipWith함수는 여러개의 mono객체들을 합체 시켜주는 함수 최초 리턴 시키는 객체가 결과를 가져온 대로 모두를 업고 간다고 생각하면 됨
+            .map {
+                DashBoard(
+                         adminTopUser = it.t1,
+                         adminTopMenu = it.t2
+                )
+            }// stream을 이어가는 객체는 DashBoard객체
+
+            .zipWith(topType())
+            .map {
+                it.t1.copy(
+                        adminTopType = it.t2)
+            }
+            .zipWith(userCount())
+            .map {
+                it.t1.copy(
+                        adminUserCount = it.t2
+                )
+            }
+            .zipWith(orderCount())
+            .map {
+                it.t1.copy(
+                        adminOrderCount = it.t2
+                )
+            }
+            .zipWith(orderTotal())
+            .map {
+                it.t1.copy(
+                        adminTotal = it.t2
+                )
+            }
 
 }
 

@@ -1,8 +1,9 @@
 package com.example.demo.controller
 
-import com.example.demo.domain.dao.OrderForm
-import com.example.demo.domain.dao.TopUser
+import com.example.demo.domain.Enum.MenuType
+import com.example.demo.domain.dao.*
 import com.example.demo.domain.entity.Order
+import com.example.demo.domain.entity.OrderDetail
 import com.example.demo.service.OrderService
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
@@ -27,15 +28,16 @@ class OrderController(
             @RequestBody @Valid orderForm : OrderForm // 입력받을 객체폼을 하나 만듦 Foot컴포넌트 부분 (Product, quantity(수량)이 들어갈 폼)
     ): Mono<Order> = orderService.createOrder(userId, orderForm)
 
-    @GetMapping("/test")
-    fun test(): Int? {
-        return orderService.test()
-    }
+    @GetMapping("/topUser")
+    fun test1(): Mono<TopUser> = orderService.topUser()
 
-    @GetMapping("/test2")
-    fun test2(): TopUser {
-        return orderService.test2()
-    }
+    @GetMapping("/topMenu")
+    fun test2(): Mono<TopMenu> = orderService.topMenu()
 
+    @GetMapping("/topType")
+    fun test3(): Mono<TopType> = orderService.topType()
+
+    @GetMapping("/admin/dashBoard")
+    fun getDashBoard(): Mono<DashBoard> = orderService.getDashBoard()
 
 }

@@ -18,8 +18,13 @@ class OrderDetailController(
         val orderDetailService: OrderDetailService
 ) {
 
-    @RequestMapping
+    @GetMapping
     fun readAll():Flux<OrderDetail?> =
             orderDetailService.readAll()
+
+    @GetMapping("test")
+    fun testTopMenu(): Int? {
+        return orderDetailService.test1()
+    }
 
 }

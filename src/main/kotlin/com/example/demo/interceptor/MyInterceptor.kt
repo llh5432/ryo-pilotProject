@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTVerificationException
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.server.ServerWebExchange
@@ -19,6 +20,9 @@ class MyInterceptor: WebFilter { // kotlin 에서 java의 interceptor 대신 Web
                         webFilterChain: WebFilterChain): Mono<Void> { // void를 리턴함..
         // WebFilter 예외처리..
         if (serverWebExchange.request.path.toString().contains("login")) return webFilterChain.filter(serverWebExchange)
+
+
+        if (serverWebExchange.request.method === HttpMethod.OPTIONS) return webFilterChain.filter(serverWebExchange) // OPTION에 대한 필터도 추가
 
         val authorizationHeader = serverWebExchange.request.headers["authorization"]?.get(0) ?: "" // token을 받아옴
         return if (authorizationHeader.isNotEmpty()) { // token이 있다면

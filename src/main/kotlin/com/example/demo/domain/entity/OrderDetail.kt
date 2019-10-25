@@ -28,7 +28,7 @@ data class OrderDetail(
 
         val quantity: Int,
 
-        val total: Int? = 0, // 초기화
+        val total: Int = 0, // 초기화
 
         @Column(insertable = false, updatable = false)
         val createdAt : LocalDateTime? = null // 이것도 마찬가지 null
