@@ -47,7 +47,7 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
             .fromSupplier {
                 productRepository.findByMenuEquals(product.menu) //DB 전체를 찾지말고 그냥 바로 INSERT하는 메뉴이름만 뽑아서 찾아냄
             }.map {
-                if (it == 0) {
+                if (it.isEmpty()) {
                     productRepository.save(product)
                 } else {
                     throw RestException(HttpStatus.ALREADY_REPORTED, "이미 생성된 메뉴입니다. menu : ${product.menu}")
