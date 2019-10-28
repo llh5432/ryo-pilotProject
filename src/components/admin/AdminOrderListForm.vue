@@ -10,31 +10,37 @@
                 small
                 hover
                 responsive="sm">
-            <template v-slot:cell(test)="data">
-                <span>{{data.item.user.user_account + ',' + data.item.user.user_email}}</span>
-            </template>
-
 
             <template v-slot:cell(order_details)="row">
                 <b-button size="sm" @click="row.toggleDetails" class="mr-2">
                     {{ row.detailsShowing ? 'Hide' : 'Show'}} Details
                 </b-button>
 
-                <!-- As `row.showDetails` is one-way, we call the toggleDetails function on @change -->
-<!--                <b-form-checkbox v-model="row.detailsShowing" @change="row.toggleDetails">-->
-<!--                    Details via check-->
-<!--                </b-form-checkbox>-->
             </template>
 
             <template v-slot:row-details="row">
                 <b-card>
                     <b-row class="mb-2">
+                        <b-col sm="3" class="text-sm-right"><b>MenuType : </b></b-col>
                         <b-col v-for="orderDetail in row.item.order_details">{{ orderDetail.product.menu_type }}</b-col>
+                    </b-row>
+                    <b-row class="mb-2">
+                        <b-col sm="3" class="text-sm-right"><b>Menu : </b></b-col>
+                        <b-col v-for="orderDetail in row.item.order_details">{{ orderDetail.product.menu }}</b-col>
+                    </b-row>
+                    <b-row class="mb-2">
+                        <b-col sm="3" class="text-sm-right"><b>Price : </b></b-col>
+                        <b-col v-for="orderDetail in row.item.order_details">{{ orderDetail.product.price }}</b-col>
+                    </b-row>
+                    <b-row class="mb-2">
+                        <b-col sm="3" class="text-sm-right"><b>Quantity : </b></b-col>
+                        <b-col v-for="orderDetail in row.item.order_details">{{ orderDetail.quantity }}</b-col>
                     </b-row>
                     <b-button size="sm" @click="row.toggleDetails">Hide Details</b-button>
                 </b-card>
             </template>
         </b-table>
+
         <b-pagination align="center"
                       v-model="currentPage"
                       :total-rows="rows"
@@ -60,7 +66,6 @@
             pilotApi.get("/api/v1/orders")
                 .then(response => {
                     this.items = response.data
-                    console.log(response.data)
                 })
         },
         data() {
@@ -68,13 +73,12 @@
                 perPage: 3,
                 currentPage: 1,
                 fields: [
-                    { key: 'test', label: 'test1123123' },
-                    'order_id',
-                    { key: 'user.user_account', label: 'user'},
-                    'order_total_price',
-                    'order_total_quantity',
-                    'order_details',
-                    'order_created_at'
+                    { key: 'order_id', label: 'Order_Id'},
+                    { key: 'user.user_account', label: 'User'},
+                    { key: 'order_total_price', label: 'Total'},
+                    { key: 'order_total_quantity', label: 'Quantity'},
+                    { key: 'order_details', label: 'Order_Detail'},
+                    { key: 'order_created_at', label: 'Order_Created_At'}
                 ],
                 items: []
             }
@@ -83,11 +87,6 @@
             rows() {
 
                 return this.items.length
-            },
-            test(){
-                for(let i in this.items){
-                    console.log(this.items[i])
-                }
             }
         }
     }
