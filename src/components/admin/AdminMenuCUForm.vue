@@ -1,33 +1,49 @@
 <template>
     <div class="overflow-auto">
-
+    <b-card-header>
+        <div>
+            <h3>메뉴 관리</h3>
+        </div>
+    </b-card-header>
 <!--        <p class="mt-3">Current Page: {{ currentPage }}</p>-->
-        <b-table
-                id="my-table"
-                :items="items"
-                :per-page="perPage"
-                :current-page="currentPage"
-                small
-        ></b-table>
-        <div align="center">
-            <b-button v-b-modal.modal-create-menu>등 록</b-button>
+        <b-card-body>
+            <b-table
+                    id="my-table"
+                    :items="items"
+                    :fields="fields"
+                    :per-page="perPage"
+                    :current-page="currentPage"
+                    small
+                    hover
+            >
+            <template v-slot:cell(menu)="items">
+                <div sm="5">{{ items.item.menu }} <b-button class="small alert-danger">수 정</b-button></div>
+            </template>
 
+            </b-table>
+            <b-button-group>
+                <b-button class="btn-danger">삭 제</b-button>
+                <b-button v-b-modal.modal-create class="alert-info">등 록</b-button>
+            </b-button-group>
+        </b-card-body>
+
+        <footer>
             <b-pagination align="center"
                           v-model="currentPage"
                           :total-rows="rows"
                           :per-page="perPage"
                           aria-controls="my-table"
             ></b-pagination>
-        </div>
-
+        </footer>
         <b-modal
-                id="modal-create-menu"
-                ref="modal"
+                id="modal-create"
                 title="메뉴 등록"
-                @ok="createProduct"
-
+                v-model="show"
+                @show="resetModal"
+                @hidden="resetModal"
         >
-            <form @submit="createProduct">
+
+            <b-form>
                 <b-form-group
                         label="Type"
                         label-for="type-input"
@@ -37,12 +53,11 @@
                             v-model="product.menu_type"
                             required
                     >
-                        <option >Please select an option</option>
                         <option value="KR">KR</option>
                         <option value="JP">JP</option>
-                        <option value="JP">CN</option>
-                        <option value="JP">PA</option>
-                        <option value="JP">BU</option>
+                        <option value="CN">CN</option>
+                        <option value="PA">PA</option>
+                        <option value="BU">BU</option>
                     </b-form-select>
 
                 </b-form-group>
@@ -53,8 +68,10 @@
                 >
                     <b-form-input
                             id="name-input"
+                            ref="name"
                             v-model="product.menu"
                             required
+                            placeholder="메뉴이름을 입력해주세요."
                     ></b-form-input>
 
                 </b-form-group>
@@ -65,13 +82,30 @@
                 >
                     <b-form-input
                             id="price-input"
+                            ref="price"
                             v-model="product.price"
+                            placeholder="가격을 입력해주세요."
                             required
                     ></b-form-input>
 
                 </b-form-group>
-            </form>
+
+            </b-form>
+            <template v-slot:modal-footer>
+                <div class="w-100">
+                    <b-button
+                            @click="createProduct()"
+                            variant="primary"
+                            class="float-right"
+                    >
+                        등 록
+                    </b-button>
+
+                </div>
+            </template>
+
         </b-modal>
+
 
     </div>
 </template>
@@ -96,7 +130,7 @@
         },
         data() {
             return {
-                perPage: 5,
+                perPage: 8,
                 currentPage: 1,
                 fields:[
                     'product_id',
@@ -110,9 +144,10 @@
                 product:{
                     menu_type:'KR',
                     menu:'',
-                    price:0
+                    price:''
                 },
                 pilotApi: null
+                ,show:false
             }
         },
         computed: {
@@ -122,9 +157,53 @@
         },
         methods :{
             createProduct() {
-                console.log('들어오는건가?')
-                return this.pilotApi.post('/api/v1/products/create', this.product);
+                if(this.validateProduct()) {
 
+                    this.pilotApi.post('/api/v1/products/create', this.product)
+                        .then(res=> {
+                            if (res.data.error_msg != null) {
+                                alert(res.data.error_msg)
+                                return false
+                            }
+
+                            console.log(res.data.product_id)
+                            if (res.data.product_id != null){
+                                alert('메뉴가 등록되었습니다.')
+
+                            this.pilotApi.get('/api/v1/products')
+                                .then(response => {
+
+                                    this.items = response.data
+
+                                })
+                            }
+                        })
+                        .catch(err=>{
+                            alert(err.response.data.error_msg)
+                        })
+
+                    this.show=false
+                }
+
+            },
+            validateProduct(){
+                if (this.product.menu == "") {
+                    alert("메뉴가 비어있습니다!")
+                    this.$refs.name.focus()
+                    return false
+                }
+                if (this.product.price <= 0) {
+                    alert('가격을 설정해주세요!')
+                    this.$refs.price.focus()
+                    return false
+                }
+                return true
+
+            },
+            resetModal() {
+                this.product.menu_type = 'KR'
+                this.product.menu = ''
+                this.product.price = ''
             }
 
         }
