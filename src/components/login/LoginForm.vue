@@ -1,53 +1,94 @@
 <template>
-    <b-container id="containerSet" class="bv-d-md-down-none">
-        <b-row id="rowSet" class="justify-content-md-center">
-            <div id="login">
-                <b-card id="cardSet" >
-                    <form>
-                        <label>로 그 인</label>
-                        <div>
-                            <b-form-input type="text" placeholder="Account"/><br>
-                            <b-form-input type="password" placeholder="Password"/><br>
-                        </div>
-                        <b-button-group>
-                            <b-button id="jBtnSet" variant="outline-primary" to="/join">회원가입</b-button>
-                            <b-button id="lBtnSet" variant="outline-primary" to="/userMain">로그인</b-button>
-                        </b-button-group>
-
-                        <div align="end">
-                            <router-link to="/searchAccount">
-                                <label><a href="#">아이디 찾기</a></label><br>
-                            </router-link>
-                            <router-link to="/searchPassword">
-                                <label><a href="#">패스워드 찾기</a></label>
-                            </router-link>
-                        </div>
-
-                    </form>
-                </b-card>
+  <b-container class="bv-d-md-down-none" id="containerSet">
+    <b-row class="justify-content-md-center" id="rowSet">
+      <div id="login">
+        <b-card id="cardSet">
+          <b-form @submit="loginCheck(loginForm.user_account, loginForm.user_password)">
+            <label>로 그 인</label>
+            <div>
+              <b-form-input placeholder="Account" required type="text" v-model="loginForm.user_account"/>
+              <br>
+              <b-form-input placeholder="Password" required type="password" v-model="loginForm.user_password"/>
+              <br>
             </div>
-        </b-row>
-    </b-container>
+            <b-button-group>
+              <b-button id="jBtnSet" to="/join" variant="outline-primary">회원가입</b-button>
+              <b-button type="submit" variant="primary">로그인</b-button>
+            </b-button-group>
+          </b-form>
+          <div align="end">
+            <router-link to="/searchAccount">
+              <label><a href="#">아이디 찾기</a></label><br>
+            </router-link>
+            <router-link to="/searchPassword">
+              <label><a href="#">패스워드 찾기</a></label>
+            </router-link>
+          </div>
+        </b-card>
+      </div>
+    </b-row>
+  </b-container>
 </template>
 
 <script>
+  import axios from 'axios'
 
-    export default {
-        name: "LoginForm",
+  export default {
+    name: "LoginForm",
+    created() {
+      this.pilotApi = axios.create({
+        baseURL: "http://localhost:9090"
+      })
+    },
+    data() {
+      return {
+        loginForm: {
+          user_account: '',
+          user_password: ''
+        }
+      }
+    },
+    methods: {
+      loginCheck(user_account, user_password) {
+        console.log('최초 입력 값 : ' + user_account, user_password)
+        if (user_account == '' || user_password == '') {
+          alert('입력 폼을 다시 확인해주세요.');
+          return false
+        }
+        this.loginForm.user_account = user_account
+        this.loginForm.user_password = user_password
+        this.pilotApi.post(`/api/v1/logins/test`, this.loginForm)
+            .then(res => {
+              console.log('return 값은 ? : ' + res.data)
+              if (res.data == "성공") {
+                alert('로그인하였습니다.')
+                  this.$router.push("/userMain")
+              }
+            }).catch(err => {
+          console.log(err)
+          alert(err.response.data.error_msg)
+          return false
+        })
+        return
+
+      }
 
     }
+  }
 </script>
 
 <style scoped>
-    #login {
-        width: 400px;
-        margin-top: auto;
-        border: black solid;
-    }
-    #lBtnSet {
-        text-justify: auto;
-    }
-    #jBtnSet {
-        text-justify: auto;
-    }
+  #login {
+    width: 400px;
+    margin-top: auto;
+    border: black solid;
+  }
+
+  #lBtnSet {
+    text-justify: auto;
+  }
+
+  #jBtnSet {
+    text-justify: auto;
+  }
 </style>

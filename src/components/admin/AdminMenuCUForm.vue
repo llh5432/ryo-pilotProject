@@ -1,11 +1,11 @@
 <template>
     <div class="overflow-auto">
-    <b-card-header>
-        <div>
-            <h3>메뉴 관리</h3>
-        </div>
-    </b-card-header>
-<!--        <p class="mt-3">Current Page: {{ currentPage }}</p>-->
+        <b-card-header>
+            <div>
+                <h3>메뉴 관리</h3>
+            </div>
+        </b-card-header>
+        <!--        <p class="mt-3">Current Page: {{ currentPage }}</p>-->
         <b-card-body>
             <b-table
                     id="my-table"
@@ -16,25 +16,33 @@
                     small
                     hover
             >
-            <template v-slot:cell(menu)="items">
-                <div sm="5">{{ items.item.menu }} <b-button class="small alert-danger">수 정</b-button></div>
-            </template>
+
+                <!-- ref="이름" 밑에서 받아 쓸 수 있음               -->
+                <template slot="product_id" slot-scope="data">
+                    <span @click="onRowSelected(data.items.product_id)">test</span>
+                </template>
+
+                <template v-slot:cell(update&delete)="items">
+                    <b-button-group>
+                        <b-button class="small alert-danger" @click="test(items.item)">수 정</b-button>
+                        <b-button class="small btn-danger" @click="deleteApi(items.item.product_id)">삭 제</b-button>
+                    </b-button-group>
+                </template>
 
             </b-table>
-            <b-button-group>
-                <b-button class="btn-danger">삭 제</b-button>
-                <b-button v-b-modal.modal-create class="alert-info">등 록</b-button>
-            </b-button-group>
+
+            <b-button v-b-modal.modal-create class="alert-info">등 록</b-button>
         </b-card-body>
 
-        <footer>
+        <b-card-footer>
             <b-pagination align="center"
                           v-model="currentPage"
                           :total-rows="rows"
                           :per-page="perPage"
                           aria-controls="my-table"
             ></b-pagination>
-        </footer>
+        </b-card-footer>
+
         <b-modal
                 id="modal-create"
                 title="메뉴 등록"
@@ -106,15 +114,77 @@
 
         </b-modal>
 
+        <b-modal
+                id="updateModal"
+                title="메뉴 수정"
+                v-model="modalShow"
+        >
+
+            <form>
+                <b-form-group
+                        label="Type"
+                        label-for="updateSelect"
+                >
+                    <b-form-select
+                            id="updateSelect"
+                            v-model="productForm.menu_type"
+                    >
+                        <option>{{productForm.menu_type}}</option>
+                        <option value="KR">KR</option>
+                        <option value="JP">JP</option>
+                        <option value="CN">CN</option>
+                        <option value="PA">PA</option>
+                        <option value="BU">BU</option>
+                    </b-form-select>
+                </b-form-group>
+
+                <b-form-group
+                        label="Menu"
+                        label-for="updateName"
+                >
+                    <b-form-input
+                            id="updateName"
+                            v-model="productForm.menu"
+                            placeholder="메뉴를 입력해주세요."
+                    ></b-form-input>
+                </b-form-group>
+
+                <b-form-group
+                        label="Price"
+                        lable-for="updatePrice"
+                >
+                    <b-form-input
+                            id="updatePrice"
+                            v-model="productForm.price"
+                            placeholder="가격을 정해주세요."
+                    ></b-form-input>
+                </b-form-group>
+
+            </form>
+
+            <template v-slot:modal-footer="productForm">
+                <div class="w-100">
+                    <b-button
+                            @click="updateProduct(productForm)"
+                            variant="primary"
+                            class="float-right"
+                    >
+                        수 정
+                    </b-button>
+
+                </div>
+            </template>
+        </b-modal>
 
     </div>
 </template>
 
 <script>
     import axios from 'axios'
+
     export default {
-        name:"AdminMenuCUForm",
-        created(){
+        name: "AdminMenuCUForm",
+        created() {
             this.pilotApi = axios.create({
                 baseURL: "http://localhost:9090",
                 headers: {
@@ -125,6 +195,7 @@
             this.pilotApi.get("/api/v1/products")
                 .then(response => {
                     this.items = response.data
+
                 })
 
         },
@@ -132,22 +203,31 @@
             return {
                 perPage: 8,
                 currentPage: 1,
-                fields:[
+                fields: [
                     'product_id',
                     'menu_type',
                     'menu',
                     'price',
                     'created_at',
-                    'updated_at'
+                    'updated_at',
+                    'update&delete'
                 ],
                 items: [],
-                product:{
-                    menu_type:'KR',
+                updateProductId:'',
+                productForm:{
                     menu:'',
-                    price:''
+                    menu_type: '',
+                    price:'',
                 },
-                pilotApi: null
-                ,show:false
+                product: {
+                    menu_type: 'KR',
+                    menu: '',
+                    price: ''
+                },
+                pilotApi: null,
+                show: false,
+                selected: [],
+                modalShow: false
             }
         },
         computed: {
@@ -155,38 +235,66 @@
                 return this.items.length
             }
         },
-        methods :{
+        methods: {
             createProduct() {
-                if(this.validateProduct()) {
+                if (this.validateProduct()) {
 
                     this.pilotApi.post('/api/v1/products/create', this.product)
-                        .then(res=> {
+                        .then(res => {
                             if (res.data.error_msg != null) {
                                 alert(res.data.error_msg)
                                 return false
                             }
 
                             console.log(res.data.product_id)
-                            if (res.data.product_id != null){
+                            if (res.data.product_id != null) {
                                 alert('메뉴가 등록되었습니다.')
-
-                            this.pilotApi.get('/api/v1/products')
-                                .then(response => {
-
-                                    this.items = response.data
-
-                                })
+                                this.loadCurrentPage()
                             }
                         })
-                        .catch(err=>{
+                        .catch(err => {
                             alert(err.response.data.error_msg)
                         })
 
-                    this.show=false
+                    this.show = false
                 }
 
             },
-            validateProduct(){
+            updateProduct(res) {
+                if (res == null) {
+                    alert('널일수가없지')
+                } else {
+                    console.log(this.updateProductId, this.productForm)
+                    this.pilotApi.put(`/api/v1/products/update/${this.updateProductId}`,this.productForm)
+                        .then(response => {
+
+                            if (response != null) {
+                                console.log(response)
+                                alert('수정하였습니다.')
+                                this.loadCurrentPage()
+                            }
+                        })
+                        .catch(err => {
+                            alert(err.response.data.error_msg)
+                        })
+                    this.modalShow = false
+                }
+            },
+            deleteApi(res) {
+                console.log(res)
+                if (confirm("정말 삭제할겁니까? ") == true){
+                    this.pilotApi.delete(`/api/v1/products/delete/${res}`)
+                        .then(response => {
+                            if (response != null) {
+                                this.loadCurrentPage()
+                                alert("해당 데이터를 삭제했습니다.");
+                            }
+                        })
+                } else {
+                    return false
+                }
+            },
+            validateProduct() {
                 if (this.product.menu == "") {
                     alert("메뉴가 비어있습니다!")
                     this.$refs.name.focus()
@@ -204,7 +312,23 @@
                 this.product.menu_type = 'KR'
                 this.product.menu = ''
                 this.product.price = ''
-            }
+            },
+            loadCurrentPage(){
+
+                this.pilotApi.get('/api/v1/products')
+                    .then(response => {
+                        this.items = response.data
+
+                    })
+            },
+            test(res){
+                console.log(res)
+                this.modalShow = true
+                this.updateProductId= res.product_id
+                this.productForm.menu_type = res.menu_type
+                this.productForm.menu = res.menu
+                this.productForm.price = res.price
+            },
 
         }
 
