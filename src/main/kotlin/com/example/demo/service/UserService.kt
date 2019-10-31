@@ -1,13 +1,13 @@
 package com.example.demo.service
 
 import com.auth0.jwt.JWT
-import com.auth0.jwt.JWTCreator
 import com.auth0.jwt.algorithms.Algorithm
+import com.example.demo.domain.dao.LoginForm
+import com.example.demo.domain.dao.SearchAccount
 import com.example.demo.domain.entity.User
 import com.example.demo.exception.RestException
 import com.example.demo.interceptor.MyInterceptor
 import com.example.demo.repository.UserRepository
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -53,13 +53,12 @@ class UserService(
             }
 
     fun readUserAccount(
-            userEmail: String,
-            userName: String
+           searchAccount: SearchAccount
     ): Mono<String> = Mono
             .fromSupplier {
-                userRepository.findByUserEmailAndUserNameEquals(userEmail, userName)
+                userRepository.findByUserEmailAndUserNameEquals(searchAccount.userEmail, searchAccount.userName)
                         ?.userAccount
-                        ?: throw RestException(HttpStatus.NOT_FOUND, "$userEmail , $userName 으로 찾은 ID가 없습니다.")
+                        ?: throw RestException(HttpStatus.NOT_FOUND, "${searchAccount.userEmail} , ${searchAccount.userName} 으로 찾은 ID가 없습니다.")
             }
 
     fun readUserPassword(
@@ -72,6 +71,16 @@ class UserService(
                     ?: throw RestException(HttpStatus.NOT_FOUND, "$userAccount, $userEmail 으로 찾은 PASSWORD가 없습니다.")
         }
     }
+
+    fun testCheck(
+            loginForm: LoginForm
+    ): Mono<String> =
+            Mono.fromSupplier {
+                userRepository.findByUserAccountEqualsAndUserPasswordEquals(loginForm.userAccount, loginForm.userPassword)
+                ?.let { "성공" }
+                        ?: throw RestException(HttpStatus.NOT_FOUND, "틀렸어")
+            }
+
 
     fun loginCheck(
             userAccount: String,

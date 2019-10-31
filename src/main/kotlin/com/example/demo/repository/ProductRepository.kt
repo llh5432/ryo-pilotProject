@@ -9,7 +9,8 @@ import org.springframework.stereotype.Repository
 interface ProductRepository : JpaRepository<Product, Int>{// interface에 미리 JpaReopository메서드를 정의해둔것   <entityClass, pk>
 
     fun findByMenuContaining(select : String): List<Product> // 포함된 글자 찾는 쿼리
-    fun findByMenuEquals(menu: String): Int
+    fun findByMenuEquals(menu: String): List<Product>
+    fun findAllByOrderByCreatedAtDesc(): List<Product>
 
     fun findByMenuTypeEquals(selectMenuType: MenuType): List<Product> // 메뉴타입으로 찾음
     fun findByMenuTypeEqualsAndMenuContaining(selectMenuType: MenuType, selectMenu: String): List<Product>// 메뉴타입 + 메뉴포함 찾기
@@ -21,6 +22,7 @@ interface ProductRepository : JpaRepository<Product, Int>{// interface에 미리
     fun findByPriceBetween(selectMinPrice: Int, selectMaxPrice: Int): List<Product> //파라미터 최소 ~값 이상 최대 ~값 이하 사이를 찾는 쿼리
 
     fun findByMenuTypeEqualsAndMenuContainingAndPriceBetween(selectMenuType: MenuType, selectMenu: String, selectMinPrice: Int, selectMaxPrice: Int): List<Product>
+    fun findByProductId(productIds: List<Int>): List<Product>
 
 //    fun findByProductId(productId : List<Int>): List<Product>
 

@@ -104,7 +104,7 @@ class OrderService(
             }.map {
                 TopMenu(
                         topMenu = it!!.value[0].product.menu,
-                        total = it.value[0].total
+                        total = it.value.sumBy { orderDetail -> orderDetail.total }
                 )
             }
 

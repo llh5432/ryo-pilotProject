@@ -19,7 +19,7 @@ class MyInterceptor: WebFilter { // kotlin 에서 java의 interceptor 대신 Web
     override fun filter(serverWebExchange: ServerWebExchange,
                         webFilterChain: WebFilterChain): Mono<Void> { // void를 리턴함..
         // WebFilter 예외처리..
-        if (serverWebExchange.request.path.toString().contains("login")) return webFilterChain.filter(serverWebExchange)
+        if (serverWebExchange.request.path.toString().contains("logins")) return webFilterChain.filter(serverWebExchange)
 
 
         if (serverWebExchange.request.method === HttpMethod.OPTIONS) return webFilterChain.filter(serverWebExchange) // OPTION에 대한 필터도 추가

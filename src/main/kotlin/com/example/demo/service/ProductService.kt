@@ -17,7 +17,7 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
 
     fun readProductAll(): Flux<Product> = Mono
             .fromSupplier {
-                productRepository.findAll()
+                productRepository.findAllByOrderByCreatedAtDesc()
             }.flatMapMany {
                 it?.let {
                     Flux.fromIterable(it)
@@ -45,13 +45,12 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
 
     fun createProduct(product: Product): Mono<Product> = Mono
             .fromSupplier {
-                productRepository.findByMenuEquals(product.menu) //DB 전체를 찾지말고 그냥 바로 INSERT하는 메뉴이름만 뽑아서 찾아냄
+                 productRepository.findByMenuEquals(product.menu) //DB 전체를 찾지말고 그냥 바로 INSERT하는 메뉴이름만 뽑아서 찾아냄
+
             }.map {
-                if (it.isEmpty()) {
-                    productRepository.save(product)
-                } else {
-                    throw RestException(HttpStatus.ALREADY_REPORTED, "이미 생성된 메뉴입니다. menu : ${product.menu}")
-                }
+                    if (it.isEmpty())productRepository.save(product)
+                            else
+                        throw RestException(HttpStatus.ALREADY_REPORTED, "이미 생성된 메뉴입니다! menu : ${product.menu}")
             }
 
     fun updateProduct(
@@ -60,6 +59,7 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
                 var target: Product = productRepository.findById(productId).get() //변수 target 생성 id값으로 product타입 빈객체를 대입
                 Mono.just(target)
                     target.menuType= product.menuType
+                    target.menu = product.menu
                     target.price = product.price
                     target.updatedAt = product.updatedAt
                 productRepository.save(target) // target에 저장된 객체를 save

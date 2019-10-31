@@ -16,17 +16,5 @@ class UserController (
     fun readAll(
     ): Flux<User> = userService.readUserAll()
 
-    @GetMapping("/search/account")
-    fun searchAccount(
-            @RequestParam userEmail: String,
-                           userName: String
-    ): Mono<String> = userService.readUserAccount(userEmail, userName)
-
-    @GetMapping("/search/password")
-    fun searchPassword(
-            @RequestParam userAccount : String,
-                          userEmail: String
-    ): Mono<String> = userService.readUserPassword(userAccount, userEmail)
-
 
 }
