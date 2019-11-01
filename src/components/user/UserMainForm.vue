@@ -91,6 +91,7 @@
           </b-tab>
           <b-tab title="검  색(Search)">
             <UserMainSearchMenuForm></UserMainSearchMenuForm>
+
           </b-tab>
           <b-tab title="주문내역(Order)">
             <UserMainOrderListForm></UserMainOrderListForm>
@@ -110,7 +111,6 @@
   export default {
     name: "UserMainForm",
     components: {UserMainOrderListForm, UserMainSearchMenuForm, UserMainProductForm},
-
   }
 </script>
 

@@ -23,8 +23,8 @@
         aria-controls="my-table"
         v-model="currentPage"
     ></b-pagination>
+<!--    <MainBodyOrderListForm></MainBodyOrderListForm>-->
   </div>
-
 </template>
 
 <script>
