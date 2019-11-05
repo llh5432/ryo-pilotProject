@@ -12,10 +12,41 @@
         :fields="fields"
         :items="items"
         :per-page="perPage"
-        :tbody-tr-class="rowClass"
         hover
         id="my-table"
-        small></b-table>
+        responsive="sm"
+        small
+        striped>
+
+      <template v-slot:cell(order_details)="row">
+        <b-button @click="row.toggleDetails" class="mr-2" size="sm">
+          {{ row.detailsShowing ? 'Hide' : 'Show'}} Detail
+        </b-button>
+
+      </template>
+
+      <template v-slot:row-details="row">
+        <b-card>
+          <b-row class="mb-2">
+            <b-col class="text-sm-right" sm="3"><b>MenuType : </b></b-col>
+            <b-col v-for="orderDetail in row.item.order_details">{{ orderDetail.product.menu_type }}</b-col>
+          </b-row>
+          <b-row class="mb-2">
+            <b-col class="text-sm-right" sm="3"><b>Menu : </b></b-col>
+            <b-col v-for="orderDetail in row.item.order_details">{{ orderDetail.product.menu }}</b-col>
+          </b-row>
+          <b-row class="mb-2">
+            <b-col class="text-sm-right" sm="3"><b>Price : </b></b-col>
+            <b-col v-for="orderDetail in row.item.order_details">{{ orderDetail.product.price }}</b-col>
+          </b-row>
+          <b-row class="mb-2">
+            <b-col class="text-sm-right" sm="3"><b>Quantity : </b></b-col>
+            <b-col v-for="orderDetail in row.item.order_details">{{ orderDetail.quantity }}</b-col>
+          </b-row>
+        </b-card>
+      </template>
+    </b-table>
+
     <b-pagination
         :per-page="perPage"
         :total-rows="rows"
@@ -23,25 +54,48 @@
         aria-controls="my-table"
         v-model="currentPage"
     ></b-pagination>
-<!--    <MainBodyOrderListForm></MainBodyOrderListForm>-->
+
   </div>
 </template>
 
 <script>
+  import axios from 'axios'
+  import Cookies from 'js-cookie'
   export default {
+    created() {
+      const pilotApi = axios.create({
+        baseURL: "http://localhost:9090",
+        headers: {
+          'Authorization': `Bearer ${Cookies.get('token')}`
+        }
+      });
+
+      let token = Cookies.get('token');
+      let jwt = require('jsonwebtoken');
+      const decoded = jwt.decode(token);
+      const tokenUserId = decoded.user_id;
+
+      pilotApi.get(`/api/v1/orders/order/${tokenUserId}`)
+          .then(response => {
+            // console.log(response)
+            this.items = response.data
+          })
+
+
+    },
     data() {
       return {
         perPage: 8,
         currentPage: 1,
-        fields: ['first_name', 'last_name', 'age'],
+        fields: [
+          {key: 'order_id', label: '주문 아이디'},
+          {key: 'user.user_account', label: '유저'},
+          {key: 'order_total_price', label: '총합'},
+          {key: 'order_total_quantity', label: '수량'},
+          {key: 'order_details', label: '상세정보'},
+          {key: 'order_created_at', label: '주문일시'}
+        ],
         items: []
-      }
-    },
-    methods: {
-      // eslint-disable-next-line no-unused-vars
-      rowClass(item, type) {
-        if (!item) return
-        if (item.status === 'awesome') return 'table-success'
       }
     },
     computed: {

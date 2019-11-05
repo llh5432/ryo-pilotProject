@@ -28,10 +28,8 @@
     created() {
       this.pilotApi = axios.create({
         baseURL: "http://localhost:9090",
-        headers: {'Content-Type': 'application/json'}
       })
 
-      //this.$router.push('/aaaa')
     },
     data() {
       return {
@@ -74,12 +72,7 @@
     margin-top: auto;
     border: black solid;
   }
-
   #lBtnSet {
-    text-justify: auto;
-  }
-
-  #jBtnSet {
     text-justify: auto;
   }
 </style>

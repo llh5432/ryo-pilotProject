@@ -9,48 +9,54 @@
         >
           <b-card-header>{{item.menu}}</b-card-header>
           <b-card-body>{{item.price}} 원</b-card-body>
-          <b-card-footer><b-button @click="soss(item)">담 기</b-button></b-card-footer>
+          <b-card-footer><b-button @click="postProduct(item)">담 기</b-button></b-card-footer>
         </b-card>
       </b-form-row>
     </b-card-group>
-    <UserMainSlotForm :selected-items="selectedItems"></UserMainSlotForm>
   </div>
 </template>
 
 <script>
-  import UserMainSlotForm from "@/components/user/UserMainSlotForm";
   import axios from "axios"
+  import Cookies from "js-cookie"
   export default {
 
-    components: {UserMainSlotForm}
+    props: ['tab']
     ,created(){
       this.pilotApi = axios.create({
         baseURL:'http://localhost:9090',
-        headers:{'Authorization': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwaWxvdC1wcm9qZWN0IiwidXNlciI6InVzZXIifQ.9WkAKFxO35XUG5_evhRqemxj8ce41WtMouJkps6iPfA"
+        headers:{
+          'Authorization': `Bearer ${Cookies.get('token')}`,
         }
       });
 
+      let type = this.tab.english
+
+      if (type == "ALL")
       this.pilotApi.get("/api/v1/products/lessThenPrice")
           .then(response => {
             this.items = response.data
-          })
+          });
+
+      if(type != "ALL")
+        this.pilotApi.get(`/api/v1/products/menuType?menuType=${type}`)
+          .then(response => {
+            this.items = response.data
+          });
+
     },
     data(){
       return{
         items:[],
-        selectedItems:[]
+
       }
     },
     methods:{
-      soss(item){
-        this.selectedItems.push(item)
-
+      postProduct(item){
+        this.$emit("product", item)
       }
-    },
-
-
-
-
+      //$emit 상위클래스에게 해당 키값의 데이터가 변했다는걸 알려줌 (키, 밸류)
+    }
   }
 </script>
 

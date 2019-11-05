@@ -1,12 +1,7 @@
 <template>
   <b-container>
     <!-- User Interface controls -->
-    <b-row align-h="end">
-      <b-card class="border-secondary">
-        검 색
-      </b-card>
-    </b-row>
-    <hr>
+
     <b-row>
 
       <b-col class="my-1" lg="6">
@@ -81,13 +76,6 @@
         v-model="currentPage"
     ></b-pagination>
 
-    <MainBodyOrderListForm></MainBodyOrderListForm>
-
-
-    <!-- Info modal -->
-<!--    <b-modal :id="infoModal.id" :title="infoModal.title" @hide="resetInfoModal" ok-only>-->
-<!--      <pre>{{ infoModal.content }}</pre>-->
-<!--    </b-modal>-->
   </b-container>
 </template>
 
@@ -105,10 +93,10 @@
         }
       });
 
-      this.pilotApi.get("/api/v1/products")
+      this.pilotApi.get("/api/v1/products/lessThenPrice")
           .then(response => {
             this.items = response.data
-            this.totalRows = this.items.length
+            // this.totalRows = this.items.length
           })
     },
     data() {
@@ -121,7 +109,7 @@
           'select'
         ],
         selected: [],
-        totalRows: 1,
+        // totalRows: 1,
         currentPage: 1,
         perPage: 5,
         filter: null,
@@ -134,15 +122,11 @@
         return this.items.length
       }
     },
-    mounted() {
-      // Set the initial number of items
-      this.totalRows = this.items.length
-    },
     methods: {
 
       onFiltered(filteredItems) {
         // Trigger pagination to update the number of buttons/pages due to filtering
-        this.totalRows = filteredItems.length
+        // this.totalRows = filteredItems.length
         this.currentPage = 1
       }
 

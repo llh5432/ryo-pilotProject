@@ -7,11 +7,35 @@ import SearchPasswordForm from "@/components/login/SearchPasswordForm";
 import UserMainForm from "@/components/user/UserMainForm";
 import UserMainProductForm from "@/components/user/UserMainProductForm";
 import AdminMainForm from "@/components/admin/AdminMainForm";
-
+import Cookies from 'js-cookie'
 Vue.use(VueRouter)
+
+const checkedToken = () => (to, from, next) => {
+  let result = Cookies.get('token');
+  if(result != null) {
+    return next();
+  }
+  alert('로그인먼저해주세요')
+  next('/');
+};
+
+const checkedAdmin = () => (to, from, next) => {
+  let token = Cookies.get('token')
+  let jwt = require('jsonwebtoken');
+  const decoded = jwt.decode(token)
+  const tokenUser = decoded.user;
+
+  if (tokenUser === 'admin') {
+    return next();
+  }
+  alert('관리자계정만 사용할 수 있습니다.');
+  next('/userMain');
+};
+
 Vue.component('user-main', {
   UserMainForm
 })
+
 export const router = new VueRouter({
   routes: [
     {
@@ -32,7 +56,8 @@ export const router = new VueRouter({
     },
     {
       path: '/userMain',
-      component: UserMainForm
+      component: UserMainForm,
+      beforeEnter: checkedToken()
     }
     , {
       path: '/product',
@@ -40,7 +65,8 @@ export const router = new VueRouter({
     }
     , {
       path: '/adminMain',
-      component: AdminMainForm
+      component: AdminMainForm,
+      beforeEnter: checkedAdmin()
     },
   ]
 })

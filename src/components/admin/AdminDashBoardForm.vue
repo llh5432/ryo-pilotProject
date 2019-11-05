@@ -67,14 +67,14 @@
 
 <script>
   import axios from 'axios'
-
+  import Cookies from 'js-cookie'
   export default {
     name: "AdminDashBoardForm",
     created() {
       const pilotApi = axios.create({
         baseURL: "http://localhost:9090",
         headers: {
-          'Authorization': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwaWxvdC1wcm9qZWN0IiwidXNlciI6InVzZXIifQ.9WkAKFxO35XUG5_evhRqemxj8ce41WtMouJkps6iPfA"
+          'Authorization': `Bearer ${Cookies.get('token')}`,
         }
       });
 

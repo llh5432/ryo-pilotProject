@@ -128,8 +128,8 @@
                     <b-form-select
                             id="updateSelect"
                             v-model="productForm.menu_type"
+                            v-bind:aria-selected="productForm.menu_type"
                     >
-                        <option>{{productForm.menu_type}}</option>
                         <option value="KR">KR</option>
                         <option value="JP">JP</option>
                         <option value="CN">CN</option>
@@ -181,14 +181,14 @@
 
 <script>
     import axios from 'axios'
-
+    import Cookies from 'js-cookie'
     export default {
         name: "AdminMenuCUForm",
         created() {
             this.pilotApi = axios.create({
                 baseURL: "http://localhost:9090",
                 headers: {
-                    'Authorization': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwaWxvdC1wcm9qZWN0IiwidXNlciI6InVzZXIifQ.9WkAKFxO35XUG5_evhRqemxj8ce41WtMouJkps6iPfA"
+                    'Authorization': `Bearer ${Cookies.get('token')}`,
                 }
             });
 

@@ -32,13 +32,15 @@
 
 <script>
   import axios from 'axios'
+  import Cookies from 'js-cookie'
 
   export default {
     name: "LoginForm",
     created() {
       this.pilotApi = axios.create({
-        baseURL: "http://localhost:9090"
+        baseURL: "http://localhost:9090",
       })
+
     },
     data() {
       return {
@@ -50,29 +52,38 @@
     },
     methods: {
       loginCheck(user_account, user_password) {
-        console.log('최초 입력 값 : ' + user_account, user_password)
-        if (user_account == '' || user_password == '') {
-          alert('입력 폼을 다시 확인해주세요.');
-          return false
-        }
-        this.loginForm.user_account = user_account
-        this.loginForm.user_password = user_password
-        this.pilotApi.post(`/api/v1/logins/test`, this.loginForm)
-            .then(res => {
-              console.log('return 값은 ? : ' + res.data)
-              if (res.data == "성공") {
-                alert('로그인하였습니다.')
-                  this.$router.push("/userMain")
+
+        this.loginForm.user_account = user_account;
+        this.loginForm.user_password = user_password;
+
+        this.pilotApi.post(`/api/v1/logins/check`, this.loginForm)
+            .then(response => {
+
+              if (response.data != null){
+                alert('로그인하였습니다.');
+
+                // console.log(response)
+                Cookies.set('token', response.data);
+                this.$router.push("/userMain");
+
+
+                let token = Cookies.get('token')
+
+                let jwt = require('jsonwebtoken');
+
+                const decoded = jwt.decode(token)
+                console.log(decoded)
+                const tokenUser = decoded.user;
+                console.log(tokenUser)
               }
+
             }).catch(err => {
-          console.log(err)
-          alert(err.response.data.error_msg)
-          return false
-        })
-        return
-
+              Cookies.remove('token')
+              console.log(err);
+              alert(err.response.data.error_msg);
+              return false;
+            })
       }
-
     }
   }
 </script>
@@ -82,10 +93,6 @@
     width: 400px;
     margin-top: auto;
     border: black solid;
-  }
-
-  #lBtnSet {
-    text-justify: auto;
   }
 
   #jBtnSet {

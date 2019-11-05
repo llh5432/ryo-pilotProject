@@ -23,7 +23,7 @@
               <b-dropdown-item to="/userMain">
                 Home Page
               </b-dropdown-item>
-              <b-dropdown-item to="/">
+              <b-dropdown-item @click="logout">
                 Sign out
               </b-dropdown-item>
             </b-nav-item-dropdown>
@@ -65,6 +65,7 @@
 </template>
 
 <script>
+  import Cookies from 'js-cookie'
   import AdminDashBoardForm from "@/components/admin/AdminDashBoardForm";
   import AdminMenuCUForm from "@/components/admin/AdminMenuCUForm";
   import AdminUserListForm from "@/components/admin/AdminUserListForm";
@@ -73,7 +74,14 @@
 
   export default {
     name: "AdminMainForm",
-    components: {AdminMenuCUForm, AdminDashBoardForm, AdminOrderListForm, AdminUserListForm}
+    components: {AdminMenuCUForm, AdminDashBoardForm, AdminOrderListForm, AdminUserListForm},
+    methods:{
+      logout() {
+        Cookies.remove('token')
+        alert('로그아웃하셨습니다.')
+        this.$router.push("/")
+      }
+    }
   }
 </script>
 
