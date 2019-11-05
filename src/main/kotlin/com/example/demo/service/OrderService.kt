@@ -35,9 +35,10 @@ class OrderService(
 
     fun readOrderById(userId: Int): Flux<Order> = Mono
             .fromSupplier {
-                orderRepository.findAllByUserUserId(userId)
+                orderRepository.findAllByUserUserIdOrderByOrderCreatedAtDesc(userId)
             }.flatMapMany {
-                it?.let { Flux.fromIterable(it) } ?: throw RestException(HttpStatus.NOT_FOUND, "아직 오더가 없습니다.")
+                it?.let { Flux.fromIterable(it) }
+                ?: throw RestException(HttpStatus.NOT_FOUND, "아직 주문가 없습니다.")
             }
 
 

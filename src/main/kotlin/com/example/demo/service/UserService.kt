@@ -17,8 +17,7 @@ import reactor.core.publisher.toMono
 
 @Service
 class UserService(
-        val userRepository: UserRepository,
-        val myInterceptor: MyInterceptor
+        val userRepository: UserRepository
 ) {
 
     fun createUser(user: User): Mono<User> =
@@ -42,7 +41,7 @@ class UserService(
 
     fun readUserAll(): Flux<User> = Mono
             .fromSupplier {
-                userRepository.findAll()
+                userRepository.findAllByOrderByUserCreatedAtDesc()
             }
             .flatMapMany {
                 if (it.isNotEmpty()) {
@@ -72,34 +71,27 @@ class UserService(
         }
     }
 
-    fun testCheck(
-            loginForm: LoginForm
-    ): Mono<String> =
-            Mono.fromSupplier {
-                userRepository.findByUserAccountEqualsAndUserPasswordEquals(loginForm.userAccount, loginForm.userPassword)
-                ?.let { "성공" }
-                        ?: throw RestException(HttpStatus.NOT_FOUND, "틀렸어")
-            }
-
-
     fun loginCheck(
-            userAccount: String,
-            userPassword : String
+            loginForm: LoginForm
     ): Mono<String> = Mono
             .fromSupplier {
-                userRepository.findByUserAccountEqualsAndUserPasswordEquals(userAccount, userPassword)
-                        ?.let { createToken(userAccount) }
-                        ?:throw RestException(HttpStatus.NOT_FOUND, "아이디 및 패스워드가 틀렸습니다.")
+                userRepository.findByUserAccountEqualsAndUserPasswordEquals(loginForm.userAccount, loginForm.userPassword)
+                        ?.let { createToken(it.userAccount, it.userId) }
+                        ?: throw RestException(HttpStatus.NOT_FOUND, "계정이나 비밀번호를 틀리셨습니다.")
             }
 
-    fun createToken(userAccount: String): String{
+
+    fun createToken(userAccount: String, userId: Int): String{
         // 아이디 패스워드 체크가 완료 되었을 시에 토큰을 생성해서 토큰 값을 return 해줌
-        val algorithm = Algorithm.HMAC256(myInterceptor.tokenKey) // algorithm 메소드의 HMAC256함수를 사용해서 토큰을 담을 그릇을 만듦(암호화 시킬 key)
+        val algorithm =
+                Algorithm.HMAC256("COAA542hQ+ECDVb7zQ77Rx5+Om+Gw+TcpIKQa3Q0E4eqZ/h6h9uijbd39/+r0+t4iGlY/ZudC2VjiTfKCJrWwk1U1hXDIWvgvULLYqiVq7GtG2FoA94LuHk9tAeKJ4x5kbd1iXE2XYpi")
+                // algorithm 메소드의 HMAC256함수를 사용해서 토큰을 담을 그릇을 만듦(암호화 시킬 key)
 
         val tokenBuilder = JWT
                 .create() // token builder를 반환함
                 .withIssuer("pilot-project") // 보통 프로젝트명을 적는거같음
-                .withClaim("user", "user") // .WITH 어쩌고 하나씩 PAYLOAD 쪽에 원하는 데이터 추가 할수있음
+                .withClaim("user", userAccount) // .WITH 어쩌고 하나씩 PAYLOAD 쪽에 원하는 데이터 추가 할수있음
+                .withClaim("user_id", userId)
         return tokenBuilder.sign(algorithm) // 새로운 JWT를 작성하고 지정된 알고리즘으로 서명함 그리고 return
     }
 

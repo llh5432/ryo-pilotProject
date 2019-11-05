@@ -25,9 +25,9 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
             }
 
 
-    fun readMenuEqual(menuType: MenuType): Flux<Product> = Mono
+    fun readMenuEqualPriceAsc(menuType: MenuType): Flux<Product> = Mono
             .fromSupplier {
-                 productRepository.findByMenuTypeEquals(menuType)
+                 productRepository.findByMenuTypeEqualsOrderByPriceAsc(menuType)
             }
             .flatMapMany {
                 it?.let {
@@ -82,6 +82,14 @@ class ProductService( // 보통 entity 네임 뒤에 패키지이름 @Autowire
                 } else {
                     throw RestException(HttpStatus.NOT_FOUND, "$selectMenu 를 포함한 메뉴가 없습니다.")
                 }
+            }
+
+    fun readByLessThenPrice(): Flux<Product> = Mono
+            .fromSupplier {
+                productRepository.findAllByOrderByPriceAsc()
+            }.flatMapMany {
+                if (it.isNotEmpty()) Flux.fromIterable(it)
+                else throw RestException(HttpStatus.NOT_FOUND, "아직 메뉴가 없습니다.")
             }
 
 

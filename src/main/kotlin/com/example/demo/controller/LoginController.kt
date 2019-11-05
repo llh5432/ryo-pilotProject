@@ -13,15 +13,6 @@ import reactor.core.publisher.Mono
 class LoginController(
         val userService: UserService
 ) {
-    @GetMapping("/Form")
-    fun loginForm(): String {
-        return "Login Form"
-    }
-
-    @GetMapping("/join")
-    fun joinForm(): String {
-        return "JoinForm"
-    }
 
     @PostMapping("/create")
     fun createUser(
@@ -30,16 +21,10 @@ class LoginController(
 
     @PostMapping("/check")
     fun loginCheck(
-            @RequestParam userAccount: String,
-            @RequestParam userPassword: String
-    ): Mono<String> {
-        return userService.loginCheck(userAccount, userPassword)
-    }
-
-    @PostMapping("/test")
-    fun test(
             @RequestBody loginForm: LoginForm
-    ): Mono<String> = userService.testCheck(loginForm)
+    ): Mono<String> {
+        return userService.loginCheck(loginForm)
+    }
 
     @GetMapping("/search/account")
     fun searchAccount(

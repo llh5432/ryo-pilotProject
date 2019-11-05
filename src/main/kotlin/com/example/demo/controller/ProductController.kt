@@ -19,15 +19,9 @@ class ProductController ( // 코드의형태는 항상 똑같게, 관행에 따�
 
 
     @GetMapping("/menuType")
-    fun readMenuType(
+    fun readMenuTypeOrderByPriceDesc(
             @RequestParam menuType: MenuType
-    ): Flux<Product> = productService.readMenuEqual(menuType)
-
-
-//    @GetMapping("/menuType/{menuType}")
-//    fun readMenuTypeEqual(
-//            @PathVariable menuType: MenuType
-//    ): Flux<Product> = productService.readMenuEqual(menuType)
+    ): Flux<Product> = productService.readMenuEqualPriceAsc(menuType)
 
 
     @GetMapping("/read/{productId}")
@@ -65,4 +59,7 @@ class ProductController ( // 코드의형태는 항상 똑같게, 관행에 따�
             @RequestParam menu: String
     ): Flux<Product> = productService.readMenu(menu)
 
+    @GetMapping("/lessThenPrice")
+    fun readByLessThenPrice(
+    ): Flux<Product> = productService.readByLessThenPrice()
 }
